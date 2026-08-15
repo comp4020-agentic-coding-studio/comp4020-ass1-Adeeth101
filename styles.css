@@ -1,13 +1,79 @@
+/* Museum Editorial v1.0 — see MUSEUM-EDITORIAL-SPEC.md.
+   Every custom property below is copied from spec §11; no value outside
+   that list is used anywhere in this file. */
+
 :root {
   color-scheme: dark;
 
-  --bg: #0b0e14;
-  --bg-elevated: #131722;
-  --text: #e8ecf4;
-  --text-dim: #9aa4b8;
-  --accent: #7dd3c0;
-  --accent-dim: #3a5f57;
-  --focus-ring: #f2c94c;
+  /* Ground */
+  --bg: #14171b;
+  --bg-alt: #1a1e23;
+  --surface: #1f242a;
+
+  /* Ink */
+  --text: #ece7dd;
+  --text-2: #9a968c;
+  --text-3: #6b6862;
+
+  /* Accent */
+  --brass: #c6a15b;
+  --cool: #7e9ba6;
+  --rust: #a0664f;
+
+  /* Structure */
+  --rule: rgb(236 231 221 / 14%);
+  --rule-soft: rgb(236 231 221 / 7%);
+  --frame-off: rgb(198 161 91 / 8%);
+  --frame-on: rgb(198 161 91 / 55%);
+
+  /* Type */
+  --serif: "Newsreader", georgia, serif;
+  --cond: "Barlow Condensed", sans-serif;
+  --measure: 52ch;
+
+  /* Space */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 28px;
+  --s7: 48px;
+  --s8: 96px;
+  --s9: 128px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 500ms;
+}
+
+/* Self-hosted per spec §03 — no runtime CDN dependency. Spec's literal
+   @font-face block uses root-absolute `/fonts/...` URLs; this repo's build
+   deploys under a GitHub Pages subpath (vite.config.ts's `base: "./"`
+   exists specifically to avoid that), so these use relative paths instead.
+   Flagged to the user as a deliberate, necessary deviation. */
+@font-face {
+  font-family: Newsreader;
+  src: url("./fonts/newsreader-var.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Newsreader;
+  src: url("./fonts/newsreader-italic-var.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow Condensed";
+  src: url("./fonts/barlow-condensed-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 * {
@@ -18,7 +84,14 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Required guard (spec §08) — not optional. */
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+  }
+
   html {
     scroll-behavior: auto;
   }
@@ -28,9 +101,21 @@ body {
   margin: 0;
   overflow-x: hidden;
   background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, "Segoe UI", sans-serif;
-  line-height: 1.6;
+  color: var(--text-2);
+  font-family: var(--serif);
+  line-height: 1.68;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
 }
 
 .skip-link {
@@ -38,10 +123,14 @@ body {
   top: 0;
   left: -9999px;
   z-index: 100;
-  padding: 0.75rem 1.25rem;
-  background: var(--accent);
-  color: #05201a;
-  font-weight: 600;
+  padding: var(--s3) var(--s5);
+  background: var(--bg-alt);
+  color: var(--brass);
+  border: 1px solid var(--brass);
+  font-family: var(--cond);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .skip-link:focus {
@@ -49,141 +138,405 @@ body {
   left: 1rem;
 }
 
+a {
+  color: var(--brass);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+
+/* ---- Header ---- */
+
 .site-header {
-  max-width: 60ch;
+  max-width: 940px;
   margin: 0 auto;
-  padding: 3rem 1.5rem 2rem;
+  padding: var(--s8) 18px var(--s7);
   text-align: center;
 }
 
+@media (width >= 720px) {
+  .site-header {
+    padding-inline: 32px;
+  }
+}
+
 .site-header h1 {
-  margin-bottom: 0.5rem;
-  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  margin: 0 0 var(--s3);
+  font-family: var(--serif);
+  font-weight: 500;
+  font-optical-sizing: none;
+  font-variation-settings: "opsz" 40;
+  font-size: clamp(36px, 6vw, 60px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  text-wrap: balance;
 }
 
 .subtitle {
-  color: var(--text-dim);
+  max-width: var(--measure);
+  margin-inline: auto;
+  color: var(--text-2);
 }
 
 nav[aria-label="Chapters"] {
-  margin-top: 1.5rem;
+  margin-top: var(--s5);
   text-align: left;
 }
 
 #chapter-list summary {
-  padding: 0.5rem 0;
-  color: var(--accent);
-  font-weight: 600;
+  padding: var(--s2) 0;
+  color: var(--brass);
+  font-family: var(--cond);
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
 .chapter-links {
   max-height: 40vh;
-  padding-left: 1.25rem;
+  padding-left: var(--s5);
   overflow-y: auto;
   font-size: 0.9rem;
 }
 
 .chapter-links li {
-  margin: 0.25rem 0;
+  margin: var(--s1) 0;
 }
 
 .chapter-links a {
-  color: var(--text-dim);
+  color: var(--text-2);
   text-decoration: none;
 }
 
 .chapter-links a:hover,
 .chapter-links a:focus-visible {
-  color: var(--accent);
+  color: var(--brass);
   text-decoration: underline;
 }
 
-.depth-gauge {
-  position: fixed;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 50;
-  max-width: min(70vw, 26rem);
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--accent-dim);
-  border-radius: 0.5rem;
-  background: rgb(19 23 34 / 90%);
-  color: var(--text-dim);
-  font-size: 0.8rem;
-  pointer-events: none;
+/* ---- Depth gauge (spec §06) ---- */
+
+.gauge {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: var(--s3) 18px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
 }
+
+@media (width >= 720px) {
+  .gauge {
+    padding: var(--s3) 32px;
+  }
+}
+
+.gauge-track {
+  position: relative;
+  height: 2px;
+  margin-bottom: var(--s2);
+  background: var(--rule-soft);
+}
+
+/* Fill and tick track scroll position directly (updated inline from
+   main.ts) — deliberately no transition on either, per spec §06/§08: a
+   transition here would lag behind the scroll and read as broken. */
+.gauge-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  background: var(--brass);
+}
+
+.gauge-tick {
+  position: absolute;
+  top: -3px;
+  left: 0%;
+  width: 2px;
+  height: 8px;
+  margin-left: -1px;
+  background: var(--brass);
+}
+
+.gauge-readouts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+}
+
+@media (width >= 720px) {
+  .gauge-readouts {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+}
+
+.gauge-plate,
+.gauge-date {
+  font-family: var(--cond);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- Lineage layout ---- */
 
 #lineage {
-  max-width: 60ch;
-  margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: var(--s7) 18px var(--s9);
 }
 
-.node {
+@media (width >= 720px) {
+  #lineage {
+    padding-inline: 32px;
+  }
+}
+
+.node-row {
   display: flex;
-  min-height: calc(55vh * var(--weight, 1));
   flex-direction: column;
-  justify-content: center;
-  padding: 3rem 0;
-  border-top: 1px solid var(--bg-elevated);
+  align-items: center;
+  max-width: calc(940px + var(--s7) + var(--s8));
+  margin-inline: auto;
+  gap: var(--s5);
+}
+
+.node-row + .node-row {
+  margin-top: 32px;
+}
+
+@media (width >= 720px) {
+  .node-row {
+    flex-direction: row-reverse;
+    align-items: stretch;
+    gap: var(--s7);
+  }
+
+  .node-row + .node-row {
+    margin-top: var(--s7);
+  }
+}
+
+/* ---- Branch-line diagram (spec §07) ---- */
+
+.node-diagram {
+  flex-shrink: 0;
+  width: 100%;
+  height: 64px;
+}
+
+@media (width >= 720px) {
+  .node-diagram {
+    width: 96px;
+    height: auto;
+  }
+}
+
+.node-diagram svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.node-diagram-visible svg {
+  opacity: 1;
+}
+
+/* ---- The plate (spec §05/§11) ---- */
+
+.plate {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+  padding: 6px;
+  background: transparent;
+  transition: background var(--dur) var(--ease);
+}
+
+@media (width >= 720px) {
+  .plate {
+    padding: var(--s2);
+  }
+}
+
+.plate-frame {
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--frame-off);
+  pointer-events: none;
+  transition: border-color var(--dur) var(--ease);
+}
+
+@media (width >= 720px) {
+  .plate-frame {
+    inset: var(--s2);
+  }
+}
+
+.plate-in {
+  padding: 20px 20px 22px;
+  opacity: 0.55;
+  transition: opacity var(--dur) var(--ease);
+}
+
+@media (width >= 720px) {
+  .plate-in {
+    padding: var(--s5) var(--s6) 26px;
+  }
+}
+
+.plate-num {
+  margin: 0 0 var(--s3);
+  font-family: var(--cond);
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.plate-title {
+  margin: 0 0 3px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-optical-sizing: none;
+  font-variation-settings: "opsz" 36;
+  font-size: clamp(22px, 6.8vw, 26px);
+  line-height: 1.1;
+  letter-spacing: -0.012em;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+@media (width >= 720px) {
+  .plate-title {
+    font-size: 28px;
+  }
+}
+
+.plate-sub {
+  margin: 0 0 14px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--cool);
+}
+
+.plate-body {
+  max-width: none;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-optical-sizing: none;
+  font-variation-settings: "opsz" 14;
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--text-2);
+  font-variant-numeric: oldstyle-nums;
   overflow-wrap: break-word;
 }
 
-.node:first-child {
-  border-top: none;
+@media (width >= 720px) {
+  .plate-body {
+    max-width: var(--measure);
+    line-height: 1.68;
+  }
 }
 
-.node h2 {
-  margin: 0 0 0.5rem;
-  font-size: clamp(1.3rem, 4vw, 1.8rem);
+.plate-body p {
+  margin: 0 0 var(--s3);
 }
 
-.node p {
-  margin: 0.5rem 0;
+.plate-body p:last-child {
+  margin-bottom: 0;
+}
+
+.plate-body strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.plate-cap {
+  margin-top: var(--s4);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--rule);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path var(--dur) var(--ease);
+}
+
+.plate-cap-label {
+  margin: 0 0 4px;
+  font-family: var(--cond);
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.plate-cap-text {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-3);
+  font-variant-numeric: oldstyle-nums;
   overflow-wrap: break-word;
 }
 
-.node-age {
-  color: var(--accent);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+/* Dormant → active (spec §05 state table). Never a transform, never a
+   shadow — background/border-color/opacity/clip-path only. */
+.plate-on {
+  background: var(--surface);
 }
 
-.node-source {
-  margin-top: 1rem;
-  color: var(--text-dim);
-  font-size: 0.8rem;
+.plate-on .plate-frame {
+  border-color: var(--frame-on);
 }
 
-.node[data-current="true"] {
-  margin: 0 -1.5rem;
-  padding: 3rem 1.5rem;
-  border-radius: 0.75rem;
-  background: var(--bg-elevated);
+.plate-on .plate-in {
+  opacity: 1;
 }
 
-.node:focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 4px;
+.plate-on .plate-cap {
+  clip-path: inset(0 0 0 0);
 }
+
+.plate:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+
+/* ---- Footer ---- */
 
 .site-footer {
-  max-width: 60ch;
+  max-width: 940px;
   margin: 0 auto;
-  padding: 3rem 1.5rem 5rem;
-  color: var(--text-dim);
+  padding: var(--s7) 18px var(--s9);
+  color: var(--text-3);
   font-size: 0.85rem;
   text-align: center;
 }
 
-.site-footer-link {
-  color: var(--accent);
+@media (width >= 720px) {
+  .site-footer {
+    padding-inline: 32px;
+  }
 }
 
-@media (width <= 480px) {
-  .depth-gauge {
-    inset: auto 0.75rem 0.75rem;
-    max-width: none;
-  }
+.site-footer-link {
+  color: var(--brass);
 }
