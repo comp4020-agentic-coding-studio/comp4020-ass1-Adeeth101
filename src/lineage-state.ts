@@ -19,5 +19,25 @@ export interface LineageState {
 }
 
 export function createLineage(nodes: LineageNode[]): LineageState {
-  throw new Error(`not implemented — ${nodes.length} nodes given`);
+  const lastIndex = nodes.length - 1;
+  let current = 0;
+
+  const clamp = (index: number): number => Math.min(Math.max(index, 0), lastIndex);
+
+  return {
+    getCurrentIndex: () => current,
+    advance: () => {
+      current = clamp(current + 1);
+    },
+    retreat: () => {
+      current = clamp(current - 1);
+    },
+    goTo: (index: number) => {
+      current = clamp(index);
+    },
+    setFromProgress: (progress: number) => {
+      const clampedProgress = Math.min(Math.max(progress, 0), 1);
+      current = clamp(Math.round(clampedProgress * lastIndex));
+    },
+  };
 }

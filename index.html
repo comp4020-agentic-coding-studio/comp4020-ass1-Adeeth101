@@ -3,22 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>COMP4020 prototype</title>
+    <title>One Unbroken Line — from LUCA to you</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header>
-      <nav aria-label="Primary">
-        <a href="./">Home</a>
+    <a class="skip-link" href="#lineage">Skip to the lineage</a>
+
+    <header class="site-header">
+      <h1>One unbroken line</h1>
+      <p class="subtitle">
+        Scroll down your own direct ancestry, from LUCA to you. At every
+        step, something else peels away — a cousin, not an ancestor. Every
+        organism you've ever called "primitive" is standing at the end of a
+        line exactly as long as yours.
+      </p>
+      <nav aria-label="Chapters">
+        <details id="chapter-list">
+          <summary>Jump to a moment</summary>
+          <ol id="chapter-links" class="chapter-links"></ol>
+        </details>
       </nav>
     </header>
-    <main>
-      <h1>COMP4020 prototype</h1>
-      <p data-testid="intro">
-        Replace this with your prototype. This week's brief is on the course website;
-        <code>spec/README.md</code> explains how the checks in this repo relate to it.
+
+    <div id="depth-gauge" class="depth-gauge" role="status" aria-live="polite"></div>
+
+    <main id="lineage"></main>
+
+    <footer class="site-footer">
+      <p>
+        Inspired by, and answering, UsefulCharts'
+        <a
+          class="site-footer-link"
+          href="https://www.youtube.com/watch?v=ii4510LeRXo"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Evolutionary Tree of Life</a
+        >
+        — a linear chart, answered here with something you move through
+        yourself rather than watch.
       </p>
-    </main>
+    </footer>
+
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

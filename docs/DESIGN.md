@@ -225,6 +225,39 @@ Euarchontoglires, not a branch leaving from within it. Get this right
 against TimeTree/a primary reference in Phase 2 rather than trusting either
 the original draft or this rewrite from memory.
 
+**Resolved in Phase 2:** the flag was correct, and the fix turned out to be
+a rename, not a data error. At ~90–96 Ma, Boreoeutheria splits into
+Euarchontoglires and Laurasiatheria as sister groups — the draft's age and
+its branch content ("dogs, whales, bats, horses leave") were both already
+right, they were just attached to the wrong node name. The node is renamed
+**Boreoeutheria** in `src/data/lineage.ts`; the next node down ("Primates")
+already correctly represents the actual Euarchontoglires-internal split
+(Primates vs. Glires) and needed no change. Source: standard placental
+mammal phylogenomics (ScienceDirect's Boreoeutheria overview; PMC298725).
+
+Two further corrections came out of the same Phase 2 research pass, neither
+flagged in Phase 1:
+
+- **Simiiformes' "gained three-colour vision" claim didn't hold up.**
+  Tarsiers — the cousins who leave at this exact split — likely already
+  carried much of the same colour-vision gene toolkit (Melin et al. 2013),
+  so trichromacy isn't something gained *here*. Reframed as a
+  cousins-aren't-primitive moment instead of a trait-gain moment, which
+  fits the page's point of view better than the original claim did, not
+  worse.
+- **Homo sapiens' branch timing was wrong.** The draft implied Neanderthals
+  and Denisovans "leave" at ~300 ka, the fossil-origin date for anatomically
+  modern humans. They don't — the genetic split from that lineage is
+  commonly dated ~550–765 ka, roughly a quarter of a million years earlier.
+  Corrected the branch text, and replaced the intended trait with a better,
+  well-evidenced one: the ~47,000-year-old interbreeding event is why most
+  non-African humans carry Neanderthal DNA today.
+
+Both are recorded in full, with sources, in `src/data/lineage.ts` itself —
+that file is now the canonical source list; see the note on
+`docs/PLAN.md`'s Phase 2 section about why a separate `docs/SOURCES.md`
+wasn't also written.
+
 **Result: 28 nodes**, down from the drafted 39 — see the finalized list in
 `docs/PLAN.md`. Two more (Eumetazoa, Simiiformes) are marked there as
 optional next cuts if 28 still runs long in testing, but weren't cut here
