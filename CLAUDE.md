@@ -166,3 +166,128 @@ catching you out, a fact about the stack the agent keeps getting wrong --- write
 it down here. Growing this file is the work of harness engineering, and the gap
 between this boilerplate and your own version is part of what your prototype
 says about the developer you're becoming.
+
+---
+
+# Project rules — "one unbroken line" (Assignment 1)
+
+Everything below this line is mine, not the template's. Added 2026-08-15.
+
+## Read these first
+
+- **`CONTEXT.md`** — the brief, the live spec, the idea, the sources, and the
+  decisions already made with their rejected alternatives.
+- **`docs/PLAN.md`** — the phased route and the draft node list.
+
+Do not re-derive the deliverable requirements from memory. They were fetched
+live from the course API on 2026-08-15 and written into `CONTEXT.md`. If a
+requirement matters and might have changed, re-fetch it rather than trusting
+either of us.
+
+## Which credits this session burns
+
+Sessions opened **in this repo** run on **course credits** via
+`.claude/settings.local.json` (untracked, and `.gitignore` blocks `.claude/`).
+This requires the **ANU VPN (GlobalProtect)** — `strproxy` is unreachable from
+the public internet, so without the VPN the session fails outright rather than
+quietly falling back to the personal plan.
+
+Sessions opened at the `COMP 4020` folder root run on the **personal** plan.
+That's deliberate: planning and admin are paid personally, building is paid by
+the course. Never add proxy config outside this repo.
+
+## Authorship — do not cross this line
+
+**`PROCESS.md` and `reflections/assignment-1.md` are written by me, in my own
+voice.** Do not draft, ghostwrite, or "improve" their prose, and do not offer a
+draft for me to edit.
+
+You *may*: remind me they're outstanding, gather candidate commit hashes and
+ranges, count words against the 400–600 / 150–300 limits, check the filename is
+exactly `assignment-1.md`, and verify cited commits resolve.
+
+Both documents are assessed as my own account of my own work. A drafted one
+would be worth nothing even if it were good.
+
+## Scope discipline
+
+The brief's constraint is **one strong idea, one dataset or mechanic, and
+nothing else**, and over-scoping is an explicit fail band.
+
+- The spine is the **human lineage only**. Branches are *shown leaving* and
+  **never followed**.
+- Do not propose exploring sideways, adding other kingdoms, adding a quiz, or
+  adding a second mechanic. If a feature doesn't serve "one unbroken line to
+  you", the answer is no.
+- If you think something is out of scope, **say so instead of building it**.
+
+## Science accuracy
+
+This is a factual explainer; wrong science destroys the point of view.
+
+- Divergence dates come from **TimeTree** or a cited primary reference, never
+  from memory and never from the inspiration video.
+- **Never invent precision.** Prefer "~420 million years ago" or an explicit
+  range over a fake-exact figure. Every node carries a `source`.
+- AI-generated organisms are **plausible reconstructions**, labelled as
+  AI-generated on the page. Where a fossil constrains the appearance, the
+  generation prompt must say so.
+- The UsefulCharts video is **inspiration and foil, credited** — never a source
+  to copy from. Do not reproduce its chart, groupings, script or artwork.
+
+## Media
+
+- **No `<video>` elements for scroll-driven sequences.** Hero sequences ship as
+  **WebP frame sequences** scrubbed by scroll position. Reason: all seven
+  course exemplars are code-drawn or static-image and none ship video; Deep
+  Sea's asset list is ~128 PNGs and zero video files. Frames scrub reversibly,
+  survive iOS Safari, stay keyboard-drivable and lazy-load.
+- Frame sequences are decorative containers (`aria-hidden`) with one real
+  described image — not 120 `<img>` tags each demanding alt text.
+- Budget: **≤120 frames and ≤1.5 MB per sequence**, two width variants.
+- The site must build and pass its checks **with placeholders**. Media landing
+  late must never block the build.
+
+## Accessibility and robustness are contract, not polish
+
+The marker tabs through the page, resizes mid-interaction, and loads it on a
+slow connection. That is the HD band for the artefact criterion, so:
+
+- Every scroll interaction has a **keyboard equivalent** (arrows, PageDown/Up,
+  Home/End) with a visible focus indicator that tracks the current node.
+- `prefers-reduced-motion` must yield a **static, readable** page — not a
+  broken one.
+- Resizing mid-interaction must not lose the current node or strand the
+  visitor.
+- Never scroll-jack in a way that traps the keyboard.
+
+## Working method
+
+- **Twice-wrong ⇒ fix the harness.** If the same class of error happens twice,
+  do not re-prompt a third time. Add a rule here or wire a check, and **commit
+  that on its own** so it can be cited. Re-prompting until it passes is the
+  routine case; changing what the work runs against is the skilled one, and
+  that distinction is explicitly where the marks are.
+- **Write the test before the feature** for anything the spec states as a
+  contract. A test I wrote that fails on purpose is worth committing.
+- **Verify at the rendered page, not the diff.** "The check is green" is
+  evidence. "It looks right" is not.
+- **Never delete a failed attempt silently.** Commit it, then commit the revert
+  with the reason. What got thrown away is HD evidence.
+- **Commit small and often.** The history must visibly grow with the work.
+  Never commit a red state.
+
+## Stack facts that bite
+
+- Invariants run against **`dist/`**, not source — `pnpm build` before
+  believing a green result.
+- **Exactly one `<h1>`** per page (not "at least one"), and a `<nav>` landmark
+  is required even on a single-page scroller. The chapter jump-list satisfies
+  this and earns its keep as a skip target.
+- `spec/starter.test.ts` is a worked example tied to the starter page — delete
+  it when the starter page goes, and don't treat it as an invariant.
+- The deployed site lives under the base path
+  `/comp4020-ass1-Adeeth101/`. Root-absolute asset paths look fine locally and
+  **404 in production**. Deploy early and check the live URL.
+- `pnpm check` chains with `&&`, so an early failure hides every later sensor.
+- Run scripts as `mise exec -- pnpm …` unless the shell has mise activated.
