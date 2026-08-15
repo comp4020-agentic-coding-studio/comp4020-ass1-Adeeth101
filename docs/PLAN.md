@@ -136,9 +136,13 @@ type Node = {
 **Verify against TimeTree / primary refs, cite per node, and prefer a range
 over fake precision.** Wrong science kills the point of view.
 
-**Deliverables:** `src/data/lineage.ts`, `docs/SOURCES.md`, a test asserting
-the data is well-formed (monotonically decreasing ages, no missing fields, every
-node has a source). That test catches transcription errors for free.
+**Deliverables:** `src/data/lineage.ts` ✅ done — 28 nodes, each sourced
+against TimeTree/a primary reference, verified via four parallel research
+passes rather than serially against the clock. `spec/lineage-data.test.ts` ✅
+green — monotonically decreasing ages, no missing fields, every node sourced.
+`docs/SOURCES.md` dropped as a separate file: every node's `source` field
+already carries its citation, so a standalone sources doc would just be the
+same information maintained twice.
 
 ---
 

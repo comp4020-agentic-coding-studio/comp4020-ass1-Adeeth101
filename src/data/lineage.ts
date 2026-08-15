@@ -158,9 +158,11 @@ export const LINEAGE: LineageNode[] = [
     branch: "lancelets",
     branchExamples: ["lancelets (amphioxus)"],
     gained: "a skull and a spine",
+    stillWithYou:
+      "your recurrent laryngeal nerve still detours down into your chest and back up to your throat — a fish-with-no-neck's wiring, dragged out of a straight line as vertebrate necks got longer",
     source:
-      "PMC2034537, lancelet mitogenome study — https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2034537/",
-    note: "The weakest-sourced node in this dataset — the cited figure is incidental to a paper about within-lancelet divergence, not a dedicated vertebrate/cephalochordate dating study. Worth a stronger source before shipping if time allows.",
+      "Age: PMC2034537, lancelet mitogenome study — https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2034537/. Recurrent laryngeal nerve: standard vertebrate anatomy, e.g. https://en.wikipedia.org/wiki/Recurrent_laryngeal_nerve",
+    note: "The age is the weakest-sourced figure in this dataset — the cited paper is incidental to a question about within-lancelet divergence, not a dedicated vertebrate/cephalochordate dating study. Worth a stronger date source before shipping if time allows; the anatomical fact itself is uncontested.",
   },
   {
     id: "gnathostomata",
