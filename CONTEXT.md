@@ -212,8 +212,9 @@ problem.
   `.claude/settings.local.json` (requires **ANU VPN / GlobalProtect**).
   Sessions at the `COMP 4020` folder root run on the **personal** plan. See
   the root `CLAUDE.md`.
-- **Course budget:** $200/week cap, $0 spent as of 2026-08-15, resets Thu
-  2026-08-20 09:00 — i.e. **after** this deadline, so the full $200 is
+- **Course budget:** $200/week cap, ~$1.19 spent as of Phase 1's close
+  (2026-08-15, mostly one Opus session's cold start), resets Thu 2026-08-20
+  09:00 — i.e. **after** this deadline, so the full $200 is effectively
   available for this assignment. **Target spend: ~$100**, hard ceiling $120,
   leaving headroom for the week-4 retro and Crit 3. Check with
   `/comp4020:balance`; the `comp4020-statusline` plugin shows it live.
