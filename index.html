@@ -25,7 +25,21 @@
       </nav>
     </header>
 
-    <div id="depth-gauge" class="depth-gauge" role="status" aria-live="polite"></div>
+    <p id="plate-announcer" class="sr-only" role="status" aria-live="polite"></p>
+
+    <div id="depth-gauge" class="gauge">
+      <div class="gauge-track">
+        <div class="gauge-fill" id="gauge-fill"></div>
+        <div class="gauge-tick" id="gauge-tick"></div>
+      </div>
+      <div class="gauge-readouts">
+        <span class="gauge-plate"
+          >Plate <span id="gauge-plate-num">I</span> of <span id="gauge-total">XXVIII</span> ·
+          <span id="gauge-era">Hadean</span></span
+        >
+        <span class="gauge-date" id="gauge-date">4.2 billion years before present</span>
+      </div>
+    </div>
 
     <main id="lineage"></main>
 
