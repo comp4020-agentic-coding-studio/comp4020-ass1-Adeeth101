@@ -278,14 +278,16 @@ export const LINEAGE: LineageNode[] = [
   },
   {
     id: "primates",
-    name: "The first primate",
+    name: "The primate branch splits from the rodents",
     age: 80,
-    ageRange: [75, 90],
+    ageRange: [75, 88],
     branch: "rodents, rabbits",
     branchExamples: ["rodents", "rabbits"],
-    gained: "grasping hands; nails, not claws",
+    gained:
+      "the branch, not yet the animal — the grasping hands and the flat nails that make a primate a primate are about 25 million years further down this line",
     source:
-      "Alvarez-Carretero et al. 2022, Science — https://www.science.org/doi/10.1126/science.abl8189 (80.7 Ma, 95% CI 75.0–88.3 Ma)",
+      "Foley et al. 2023, Science, \"A genomic timescale for placental mammal evolution\" — https://www.science.org/doi/10.1126/science.abl8189 (origin of Euarchontoglires 80.7 Ma, 95% CI 75.0–88.3 Ma, which is this split); crown Primates is younger — Álvarez-Carretero et al. 2022, Nature — https://www.nature.com/articles/s41586-021-04341-1 (64.3–61.8 Ma). Earliest arboreality in the group: Purgatorius tarsals ~65 Ma, PNAS 2015 — https://www.pnas.org/doi/10.1073/pnas.1421707112; earliest nail: the opposable big toe of Carpolestes simpsoni, ~56 Ma, and that digit only.",
+    note: "Corrected in the science-accuracy audit (docs/IMAGE-PROMPTS.md §05, items 7–8). The old citation named the wrong authors, the wrong journal and the wrong node: 80.7 Ma is Foley et al. 2023's origin of Euarchontoglires, not Álvarez-Carretero et al. 2022's crown Primates. The date and the branch were right for each other all along — 80.7 Ma is exactly where rodents and rabbits leave — so what changed is the name and the traits hung on it. \"Grasping hands; nails, not claws\" was ~25 Myr early: no nail-bearing grasping foot is known before Carpolestes at ~56 Ma. Same failure mode as the Boreoeutheria rename in Phase 2 — a correct number attached to the wrong node — which is why it is now a rule in CLAUDE.md rather than a third correction.",
   },
   {
     id: "haplorhini",
@@ -304,25 +306,28 @@ export const LINEAGE: LineageNode[] = [
   {
     id: "simiiformes",
     name: "Simiiformes",
-    age: 40,
-    ageRange: [35, 55],
+    age: 55,
+    ageRange: [50, 58],
     branch: "tarsiers",
     branchExamples: ["tarsiers"],
     gained: "",
     source:
-      "Melin et al. 2013 — https://www.sciencedaily.com/releases/2013/03/130327132537.htm",
-    note: "The original draft claimed \"gained three-colour vision\" here — that doesn't hold up. Tarsiers, who leave at this split, likely already carried much of the same colour-vision gene toolkit, so full trichromacy is older than (or arose after, at Catarrhini, which was cut per docs/DESIGN.md §7) this exact node. Reframed as a cousins-aren't-primitive moment rather than a trait-gain moment, which fits the page's point of view better anyway.",
+      "Date: Springer et al. 2012, PLOS ONE, \"Macroevolutionary dynamics and historical biogeography of primate diversification inferred from a species supermatrix\" — https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0049521 (Tarsiiformes/Anthropoidea 58–50 Ma; crown Primates 71–63 Ma). Colour vision: Melin et al. 2013 — https://www.sciencedaily.com/releases/2013/03/130327132537.htm",
+    note: "Date corrected from 40 Ma in the science-accuracy audit (docs/IMAGE-PROMPTS.md §05, item 9). 40 Ma was impossible: tarsiers leave at this node, so the split has to predate the fossils on both sides of it — Archicebus achilles (tarsier side) is 55 Ma and Eosimias (anthropoid side) is 45 Ma. 40 Ma is the age of crown Simiiformes, a different and younger split, so this was a correct number attached to the wrong node. The original draft claimed \"gained three-colour vision\" here — that doesn't hold up. Tarsiers, who leave at this split, likely already carried much of the same colour-vision gene toolkit, so full trichromacy is older than (or arose after, at Catarrhini, which was cut per docs/DESIGN.md §7) this exact node. Reframed as a cousins-aren't-primitive moment rather than a trait-gain moment, which fits the page's point of view better anyway.",
   },
   {
     id: "hominoidea",
     name: "Hominoidea — the apes",
     age: 27,
     ageRange: [25, 30],
-    branch: "gibbons, orangutans",
-    branchExamples: ["gibbons", "orangutans"],
+    branch:
+      "every monkey with a tail — macaques, baboons, colobus (gibbons and orangutans leave later, further down the ape branch)",
+    branchExamples: ["macaques", "baboons", "colobus monkeys"],
     gained: "no tail",
     stillWithYou: "a single broken piece of DNA — an Alu-element insertion in the TBXT gene — is why you don't have one",
-    source: "Xia et al. 2024, Nature — https://www.nature.com/articles/s41586-024-07095-8",
+    source:
+      "Tail loss: Xia et al. 2024, Nature — https://www.nature.com/articles/s41586-024-07095-8. Split date: the hominoid/cercopithecoid divergence is bracketed 29–24 Ma by Saadanius — https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6838095/",
+    note: "Branch corrected in the science-accuracy audit (docs/IMAGE-PROMPTS.md §05, item 10). The draft had gibbons and orangutans leaving here, folding in the cut Hominidae/Homininae nodes (docs/DESIGN.md §7) — but gibbons diverge ~19–15 Ma and orangutans later still, so the page had them leaving 8–12 Myr too early, and dropped every Old World monkey from the one node where monkeys actually leave. The corrected branch is also the better beat: the cousins who keep their tails leave at exactly the split where your line loses its own.",
   },
   {
     id: "hominini",
