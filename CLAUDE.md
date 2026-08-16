@@ -235,6 +235,36 @@ This is a factual explainer; wrong science destroys the point of view.
 - The UsefulCharts video is **inspiration and foil, credited** — never a source
   to copy from. Do not reproduce its chart, groupings, script or artwork.
 
+### A date is not a node (added 2026-08-16, after the third instance)
+
+Three separate times the dataset has carried a **correct number attached to the
+wrong node**: Euarchontoglires' age on a node that was really Boreoeutheria
+(caught in Phase 2), Foley et al. 2023's Euarchontoglires origin cited as crown
+Primates, and crown Simiiformes' age sitting on the tarsier split. A wrong date
+is obvious. A right date on the wrong node passes every check I have.
+
+So before accepting any node's age, verify three things **separately**, and only
+then together:
+
+1. **what the paper actually dates** — read the node name in the paper, not the
+   headline figure;
+2. **what this node is** — the clade whose origin the split defines;
+3. **which cousins `branch` says leave here** — that names the sister group, and
+   therefore names the split.
+
+If those three don't describe the same divergence, the node is wrong even though
+the number is right. This is also the cheapest place to catch it: it costs one
+sentence per node and it has now caught three errors.
+
+**Arithmetic check that needs no expertise:** a divergence cannot be younger than
+the fossils on *both* sides of it. That check alone caught Simiiformes at 40 Ma,
+with a 55 Ma tarsiiform and a 45 Ma anthropoid bracketing it.
+
+**A correction that only lands in `note` is not a correction.** `main.ts` renders
+`name`, `age`, `branch`, `gained`, `stillWithYou` and `source`. It does **not**
+render `note`. Fix the rendered field; use `note` for the reasoning behind the
+fix, and for what was thrown away.
+
 ## Media
 
 - **No `<video>` elements for scroll-driven sequences.** Hero sequences ship as
