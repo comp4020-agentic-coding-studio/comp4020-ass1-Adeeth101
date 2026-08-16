@@ -1,13 +1,25 @@
 # Image Prompts — all 28 nodes
-### "One Unbroken Line" · generated from `docs/IMAGE-STYLE.md` v1.0
+### "One Unbroken Line" · rebuilt to `docs/IMAGE-STYLE-V2.md` v2.0
 
-One ready-to-paste prompt per node in `src/data/lineage.ts`. Each is the locked
-preamble (§01) verbatim, plus the subject, plus — for fossil-constrained nodes —
-the constraint clause (§03) filled in from real reference, plus the negative list
-(§02) verbatim.
+One ready-to-paste prompt per node in `src/data/lineage.ts`, each in the five-block
+v2 architecture: **subject → anatomy → pose → style → negatives**. The style block
+(v2 §02) and the negative list (v2 §03) are verbatim in every prompt; only the first
+three blocks vary by node.
 
-**Do not edit the preamble or negative list here.** If either needs to change, change
-it in `docs/IMAGE-STYLE.md` and regenerate this file, per §08.
+**Do not edit the style block or the negative list here.** If either needs to change,
+change it once in `docs/IMAGE-STYLE-V2.md` and regenerate every prompt, per v2 §07.
+
+> **Rewritten 2026-08-16.** v1.0's four-block architecture was tested live on three
+> nodes and failed four ways, all structural — see `docs/IMAGE-STYLE-V2.md` §00. The
+> largest change is order: the subject and the load-bearing anatomy now come *first*,
+> because image models weight early tokens most and v1 buried the eight digits and the
+> aquatic posture behind sixty words of palette and lighting. The second largest is
+> that **load-bearing negatives are now positive assertions** — "no claws" became
+> "soft-tipped and blunt, ending in rounded webbing" — because naming a thing inside a
+> prohibition raises its probability rather than lowering it.
+>
+> Every bucket assignment, fossil anchor, gap and watch-note below is unchanged, as is
+> §05. Only the prompt blocks were rewritten.
 
 ---
 
@@ -52,10 +64,12 @@ for, so it does not license colour there either.
 
 ### The black-background caveat applies to every prompt here
 
-Per `docs/IMAGE-STYLE.md` §01, subjects composite with `mix-blend-mode: screen`, under
-which pure black vanishes. Screen is not keying: it lifts dark tones toward
+Per `docs/IMAGE-STYLE-V2.md` §02, subjects composite with `mix-blend-mode: screen`,
+under which pure black vanishes. Screen is not keying: it lifts dark tones toward
 transparency **inside the subject too**. Reject any generation that sits low in value,
-however good it looks alone.
+however good it looks alone. v2's style block now carries **"mid-to-light in overall
+value"** for exactly this reason, so the protection is in every prompt rather than only
+in a reviewer's memory.
 
 **The page now consumes these** (built 2026-08-16, `MUSEUM-EDITORIAL-SPEC.md` §05
 amendment). Drop a file at `images/plates/<node id>.webp` and that node's plate grows
@@ -113,31 +127,45 @@ research pass. The reasoning is in §05; the commits are separate from this file
 
 ## 02 · HOW EACH PROMPT BELOW IS ASSEMBLED
 
-Every prompt in §03 and §04 is the same four blocks in the same order, separated by
-blank lines (the blank lines are part of the prompt — they stop the model reading
-the constraint clause as a continuation of the palette instruction):
+Every prompt in §03 and §04 is the same five blocks in the same order, separated by
+blank lines (the blank lines are part of the prompt — they stop the model reading one
+block as a continuation of the last):
 
-1. **The locked preamble**, `docs/IMAGE-STYLE.md` §01, verbatim. The *only* thing
-   that varies is the `[SUBJECT]` slot.
-2. **The middle block**, which is the one thing that differs by bucket:
-   - **A / A‡** → the fossil-constraint clause (§03), filled from real reference,
-     and for A‡ explicitly scoped to *what is actually preserved*.
-   - **B** → the bucket-B schematic clause (§04), verbatim.
-3. **The negative list**, §02, verbatim.
+1. **Subject** — what it is, in one sentence, leading with the single most important
+   anatomical fact. **The order is the point**: this is what the model weights most.
+2. **Anatomy** — the fossil constraint, phrased entirely as positive assertions.
+   - **A / A‡** → filled from real reference, and for A‡ scoped in the text itself to
+     *what is actually preserved*.
+   - **B** → the aliveness clause from v2 §04, verbatim, in place of a constraint.
+3. **Pose** — stated as what the body *is* doing, never what it isn't. For bucket B
+   this block carries the node's "instead draw" detail rather than a posture.
+4. **The style block**, `docs/IMAGE-STYLE-V2.md` §02, verbatim, identical in all 27.
+5. **The negative list**, v2 §03, verbatim — four lines, only for things with no
+   positive equivalent.
 
-Nothing else may vary. If a node seems to need a different preamble, that is a
-signal to change the preamble once in `docs/IMAGE-STYLE.md` and regenerate this
-whole file (§08) — not to freelance one prompt.
+Blocks 1–3 vary per node; 4 and 5 never vary. If a node seems to need a different
+style block, that is a signal to change it once in `docs/IMAGE-STYLE-V2.md` and
+regenerate every prompt — not to freelance one.
 
-**Two rules that only show up once you are generating:**
+**Three rules that only show up once you are generating:**
+
+- **Say what to draw, not what to avoid.** Negation is weakly obeyed: "no frame"
+  produced a decorative rim and "not a walking one" produced a walking animal. Every
+  load-bearing constraint below is therefore an assertion. If you find yourself adding
+  a "do not", find the positive form instead.
+- **Do not ask for a count.** Image models do not count — *Acanthostega*'s eight
+  digits came back as five, then six. Ask for the impression: "many closely-set
+  slender digits, clearly more than five." Honest, achievable, and it carries the same
+  meaning to a reader who is not counting.
 
 - **The watch-note beats the reference image.** Several nodes here have a
   well-known illustration that current work has overturned (Chordata's orientation,
   Deuterostomia's *Saccorhytus*, Tetrapoda's *Tiktaalik*). A reverse-image search
   will confidently hand you the superseded picture. Read the watch-note first.
-- **Generate in the order §06 sets out**, not node order: three test subjects
-  first — one A, one B, and one awkward body plan — judged side by side against
-  the *live* background gradient. Only then the remaining 25.
+- **Generate in the order v2 §06 sets out**, not node order: Tetrapoda, Chordata and
+  LUCA first, at ×2 — the same three nodes that broke v1 — judged side by side against
+  the *live* background gradient. Same medium? All mid-to-light in value? LUCA alive?
+  Only then the remaining 24. v2 is a hypothesis until it survives those three.
 
 ---
 
@@ -150,34 +178,31 @@ whole file (§08) — not to freelance one prompt.
 **Watch:** Mussini et al. 2024 (*Current Biology* 34:2980–2989) **flipped this animal's orientation — every pre-2024 illustration is upside down**, so reference images found by search are unreliable. Position contested (stem-chordate / cephalochordate / craniate / annelid). No eyes are preserved in any specimen, despite Walcott reporting them.
 
 ```
-Museum specimen illustration of an early chordate, a small soft-bodied
-marine swimming animal about 4 cm long. Scientific reconstruction,
-anatomically plausible, not fantasy. Single soft key light from upper left,
-low warm fill, no rim lighting. Muted warm-neutral palette: bone, ochre,
-umber, slate grey, desaturated. Three-quarter view, subject centred, full
-body within frame with generous margin. Isolated on a pure black
-background. Matte finish, fine detail, restrained. No dramatic lighting,
-no glow.
+A small flattened eel-like sea animal about 5 cm long, its body a series of
+repeating V-shaped muscle blocks running head to tail, with a single fin
+running continuously along its back.
 
-Reconstruction constrained by known fossil material: Pikaia gracilens,
-Burgess Shale, approximately 505 million years old. Body 1.5 to 6 cm,
-fusiform and laterally compressed to roughly twice as tall as wide, tapering
-at both ends, with an expanded tail fin and delicate dorsal and ventral fin
-folds. About 100 V-shaped chevron muscle blocks along the body. A small
-bilobed head bearing one pair of short tentacles about 1 mm long. A small
-circular mouth on the underside, no jaws and no teeth. Six pairs of
-pharyngeal slits bearing filaments. A narrow gut ending in a terminal anus.
-Soft cuticle, no exoskeleton, and no eyes. Orient the animal per the 2024
-reinterpretation, with the fin folds dorsal.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Pikaia gracilens, Burgess Shale. A slender stiffening rod
+runs the length of the body just below the dorsal fin. The head is small,
+blunt and simple, bearing a pair of short slender tentacles. A row of small
+paired appendages sits just behind the head. The body is laterally
+flattened, deepest at the middle, tapering to both ends.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal is swimming, its body held in a shallow S-curve, seen from the
+side and slightly above. The dorsal fin is uppermost and the tentacled head
+leads.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -189,32 +214,34 @@ No frame, no border, no matting.
 **Watch:** Lei et al. 2026 (*Nature* 650:150–155) reinterpret the "nasal sacs" as a second pair of eyes — **a live 2026 dispute over whether this animal had two eyes or four.** This prompt follows the two-eye reconstruction; that is a choice and belongs in the caption. Some workers treat all three genera as decay-stage variants of a single animal.
 
 ```
-Museum specimen illustration of the first vertebrate, a small jawless
-fish-like marine animal about 3 cm long. Scientific reconstruction,
-anatomically plausible, not fantasy. Single soft key light from upper left,
-low warm fill, no rim lighting. Muted warm-neutral palette: bone, ochre,
-umber, slate grey, desaturated. Three-quarter view, subject centred, full
-body within frame with generous margin. Isolated on a pure black
-background. Matte finish, fine detail, restrained. No dramatic lighting,
-no glow.
+A small jawless fish-like sea animal about 3 cm long, its flanks marked by a
+repeating zigzag of double-V muscle blocks, with a sail-like fin running
+along its back and continuing into the tail.
 
-Reconstruction constrained by known fossil material: Haikouichthys
-ercaicunensis and Myllokunmingia fengjiaoa, Chengjiang, approximately 518
-million years old. 2.5 to 3 cm long, slender and elongate. A sail-like
-dorsal fin continuous with the tail fin, and a narrow ventral fin. Zigzag
-double-V muscle blocks. A notochord with vertebral elements, and a defined
-skull with cranial cartilages and ear capsules. At least six gill pouches
-with fine filaments. Two large upward-facing eyes. No jaws, no scales, no
-bone and no mineralised tissue anywhere on the body.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Haikouichthys ercaicunensis and Myllokunmingia fengjiaoa,
+Chengjiang, approximately 518 million years old. The body is slender and
+elongate, 2.5 to 3 cm long. A stiffening rod runs the full length of the
+body with small paired elements set along it, and the head carries a defined
+skull of cartilage with rounded ear capsules. At least six gill pouches sit
+behind the head, each holding fine filaments. Two large eyes face upward.
+The mouth is a simple round opening at the front of the head. A narrow fin
+runs along the underside. Every tissue in the animal is soft cartilage, and
+the skin is smooth and bare over its whole length.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal is swimming, its body held in a shallow S-curve, seen from the
+side and slightly above, the dorsal fin uppermost and the head leading.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -226,32 +253,35 @@ No frame, no border, no matting.
 **Watch:** all relevant taxa were described in 2022 and are still being revised; *Xiushanosteus* is Placodermi *incertae sedis*, mixing characters from several placoderm clades.
 
 ```
-Museum specimen illustration of an early jawed fish about 3 cm long.
-Scientific reconstruction, anatomically plausible, not fantasy. Single soft
-key light from upper left, low warm fill, no rim lighting. Muted
-warm-neutral palette: bone, ochre, umber, slate grey, desaturated.
-Three-quarter view, subject centred, full body within frame with generous
-margin. Isolated on a pure black background. Matte finish, fine detail,
-restrained. No dramatic lighting, no glow.
+A small armoured jawed fish about 3 cm long, flattened from top to bottom
+and wider than it is tall, with a hinged jaw closing beneath a bony head
+shield.
 
-Reconstruction constrained by known fossil material: Xiushanosteus
-mirabilis, Chongqing, approximately 436 million years old. About 3 cm long,
-a flattened placoderm, wider than tall. A bony head shield with paired
-plates behind the eye and at the rear, gently curving lateral line grooves,
-and long head spines projecting backward and outward. A fissure separating
-the rear skull plates, forming a mobile joint. Two median dorsal plates and
-a row of trunk scutes. Small diamond-shaped scales over the body. Two dorsal
-fins of similar size, each with a spine. A tail fin with the upper lobe
-longer and a rounded lower lobe.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Xiushanosteus mirabilis, Chongqing, approximately 436 million
+years old. A bony head shield covers the front of the animal, built from
+paired plates with one pair behind each eye and one pair at the rear, and
+gently curving lateral-line grooves crossing them. Long spines project
+backward and outward from the sides of the shield. A fissure separates the
+rear skull plates into a mobile joint. Two median plates sit on the back
+behind the head, followed by a row of trunk scutes, with small
+diamond-shaped scales covering the rest of the body. Two dorsal fins of
+similar size each carry a spine at the leading edge. The tail fin has a
+longer upper lobe and a rounded lower lobe.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal is swimming close to level, seen in three-quarter view from the
+front and slightly above so the width of the head shield reads clearly.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -263,34 +293,35 @@ No frame, no border, no matting.
 **Watch:** *Eosteus* was described in March 2026 and the "oldest bony fish" title moved off *Guiyu* very recently. *Guiyu*'s tail fin is unpreserved, so its shape is inferred.
 
 ```
-Museum specimen illustration of an early bony fish about 30 cm long.
-Scientific reconstruction, anatomically plausible, not fantasy. Single soft
-key light from upper left, low warm fill, no rim lighting. Muted
-warm-neutral palette: bone, ochre, umber, slate grey, desaturated.
-Three-quarter view, subject centred, full body within frame with generous
-margin. Isolated on a pure black background. Matte finish, fine detail,
-restrained. No dramatic lighting, no glow.
+An early bony fish about 30 cm long, streamlined, its skull bones and scales
+sheathed in a glossy enamel-like layer, with a large spine standing at the
+leading edge of each paired fin.
 
-Reconstruction constrained by known fossil material: Guiyu oneiros, Qujing,
-approximately 425 million years old. Complete animal about 30 cm long, the
-trunk about 26 cm long and 11 cm deep, head about 23 percent of body length,
-streamlined. Pectoral, pelvic and dorsal fins all bearing large spines.
-Three median plates behind the skull roof. A pelvic girdle of paired lateral
-plates plus an unpaired median plate. Skull bones and scales coated in a
-glossy enamel-like layer. Strongly regionalised scale cover: rhomboid flank
-scales bearing 5 to 35 fine ridges, distinctly taller than long toward the
-front and back, nearly square toward the belly, with large oval scutes near
-the midline of the underside. The tail fin is not preserved in the specimen;
-keep it plain and unelaborated.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Guiyu oneiros, Qujing, approximately 425 million years old.
+The trunk is about 26 cm long and 11 cm deep, and the head is about a
+quarter of the body length. Pectoral, pelvic and dorsal fins each carry a
+large spine in front. Three median plates sit behind the skull roof. The
+pelvic girdle is built from paired lateral plates with a single median plate
+between them. Scale cover is strongly regionalised: rhomboid flank scales
+bear 5 to 35 fine ridges and stand distinctly taller than long toward the
+front and back, becoming nearly square toward the belly, with large oval
+scutes along the midline of the underside. The tail fin is plain and simple
+in outline.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal is swimming level in open water, shown in left profile turned
+slightly toward the viewer.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -302,34 +333,35 @@ No frame, no border, no matting.
 **Watch — the most dangerous node in the set.** The one trait a reader expects here, the **fleshy lobed paired fin, is not documented at this node**; it is known from much younger Devonian taxa (*Osteolepis*, *Eusthenopteron*, ~370 Ma). *Psarolepis* and *Guiyu* have also been recovered *outside* crown Sarcopterygii (Lu et al. 2017), in which case this node has no good body fossil at all.
 
 ```
-Museum specimen illustration of an early lobe-finned fish. Scientific
-reconstruction, anatomically plausible, not fantasy. Single soft key light
-from upper left, low warm fill, no rim lighting. Muted warm-neutral palette:
-bone, ochre, umber, slate grey, desaturated. Three-quarter view, subject
-centred, full body within frame with generous margin. Isolated on a pure
-black background. Matte finish, fine detail, restrained. No dramatic
-lighting, no glow.
+An early bony fish with a distinctly humped snout and its nostrils set high
+above the eyes, with narrow ray-supported paired fins lying flat against the
+flanks.
 
-Reconstruction constrained by known fossil material: Psarolepis romeri,
-Qujing, approximately 419 to 411 million years old, known only from
-disarticulated material. A humped snout with the nostrils positioned above
-the eyes. Head plates covered by a smooth porcelain-like layer that obscures
-the sutures. Large fangs on the snout tooth plate and tooth whorls at the
-midline of the lower jaw. A large spine immediately in front of the pectoral
-fin and another in front of a median dorsal fin. Thick rhombic scales with a
-distinct neck between crown and base. No articulated specimen exists: the
-overall body outline is extrapolated from the related Guiyu oneiros. Do not
-depict a fleshy lobed paired fin — that morphology is documented only in
-much younger Devonian animals, not at this node.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Psarolepis romeri, Qujing, approximately 419 to 411 million
+years old, with the overall body outline following the related Guiyu
+oneiros. The head plates are sheathed in a smooth porcelain-like layer that
+hides the sutures between them. Large fangs sit on the tooth plate of the
+snout, and tooth whorls sit at the midline of the lower jaw. A large spine
+stands immediately in front of the pectoral fin and another in front of a
+median dorsal fin. The scales are thick and rhombic, each with a distinct
+neck between crown and base. The paired fins are small, narrow and supported
+by fin rays, set flat against the flank, with the body wall meeting each fin
+in one smooth continuous line.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal is swimming level, seen in left profile so the humped snout and
+the pectoral spine both read clearly.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -341,34 +373,33 @@ No frame, no border, no matting.
 **Watch — do not anchor on *Tiktaalik*.** *Tiktaalik roseae* (~375 Ma) is an elpistostegalian sarcopterygian **fish**, not a tetrapod: its pectoral appendage retains fin rays. It is the famous image for this transition and it is the wrong animal for this node. Both *Acanthostega* and *Ichthyostega* are stem tetrapods and their relative order is unstable; Long et al. (2025) place crown Tetrapoda ~379.7 Ma, older than this node.
 
 ```
-Museum specimen illustration of an early four-limbed tetrapod about 60 cm
-long. Scientific reconstruction, anatomically plausible, not fantasy. Single
-soft key light from upper left, low warm fill, no rim lighting. Muted
-warm-neutral palette: bone, ochre, umber, slate grey, desaturated.
-Three-quarter view, subject centred, full body within frame with generous
-margin. Isolated on a pure black background. Matte finish, fine detail,
-restrained. No dramatic lighting, no glow.
+An early four-limbed aquatic vertebrate about 60 cm long, with four limbs
+that each end in a broad webbed paddle bearing many closely-set slender
+digits — clearly more than five on each.
 
-Reconstruction constrained by known fossil material: Acanthostega gunnari,
-East Greenland, approximately 365 million years old. About 60 cm long. Eight
-webbed digits on each hand. No wrist joint, and an elbow that cannot flex
-forward, so the forelimb is a paddle and cannot bear the animal's weight.
-Internal gills still covered by fish-like bones. Ribs too short to support
-the chest out of water. Skull about 111 mm long, V-shaped seen from above
-and widening toward the back, with a squared rear margin, an upturned snout
-with a distinct break in slope, a hooked front lower jaw, and eye sockets
-about 15 percent of skull length. Roughly 10 upper front teeth, 44 upper
-cheek teeth and more than 60 lower jaw teeth, plus fangs on the palate.
-Depict a fully aquatic animal, not a walking one.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Acanthostega gunnari, East Greenland, approximately 365
+million years old. The digits are soft-tipped and blunt, ending in rounded
+webbing. The forelimb is a flat paddle that stays straight, hinging only
+sideways. The tail is deep and finned along its upper and lower edges like a
+fish tail. Internal gills sit behind the skull under fish-like bone. The
+ribs are short. The skull is flat on top and widens toward the back, with an
+upturned snout and eye sockets set high.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal is floating in open water in a swimming posture, its body
+horizontal, limbs held out sideways and relaxed, weight fully supported by
+water. It is shown in left profile turned very slightly toward the viewer.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -380,34 +411,35 @@ No frame, no border, no matting.
 **Watch:** Jenkins, Meyer & Bhullar (2025) recover *Hylonomus* **outside crown Amniota**, removing the classical anchor. The skin fragment is smaller than a fingernail and is not associated with a skeleton, so its attribution and body region are undetermined — treat it as grade-level evidence only.
 
 ```
-Museum specimen illustration of an early amniote, a small lizard-like land
-vertebrate about 20 cm long. Scientific reconstruction, anatomically
-plausible, not fantasy. Single soft key light from upper left, low warm
-fill, no rim lighting. Muted warm-neutral palette: bone, ochre, umber, slate
-grey, desaturated. Three-quarter view, subject centred, full body within
-frame with generous margin. Isolated on a pure black background. Matte
-finish, fine detail, restrained. No dramatic lighting, no glow.
+A small lizard-shaped land vertebrate about 20 cm long including the tail,
+its skin covered in small tubercles that sit side by side like pebbled
+crocodile hide.
 
-Reconstruction constrained by known fossil material: Hylonomus lyelli,
-Joggins, Nova Scotia, approximately 318 million years old. About 20 cm long
-including the tail, broadly lizard-like in proportion, with small sharp
-teeth suited to invertebrate prey. Trackway evidence gives a five-fingered
-hand and foot with the first and fifth digits shortest and the third and
-fourth longest, sharp inward-curving claws on the first four digits and a
-short claw on the fifth, and a posture leaving no belly or tail drag mark.
-Skin at this grade is known only from a much younger relative: closely
-spaced, non-overlapping tubercular scales with a pebbled crocodile-like
-texture and flexible hinged regions between them. Do not draw overlapping
-reptilian scales and do not draw bony armour.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Hylonomus lyelli, Joggins, Nova Scotia, approximately 318
+million years old. The proportions are broadly lizard-like, with small sharp
+teeth suited to insect prey. Trackway evidence gives five digits on each
+hand and foot, the first and fifth shortest and the third and fourth
+longest, with sharp inward-curving claws on the first four digits and a
+short claw on the fifth. The skin, known only from a much younger relative,
+is built from small tubercular scales that meet edge to edge without
+overlapping, separated by flexible hinged bands, the whole surface finely
+pebbled and even.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal walks on all fours on level ground, its body carried clear of the
+surface and its tail held straight out behind and clear of it too, seen in
+three-quarter view from the front and slightly above.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -419,34 +451,34 @@ No frame, no border, no matting.
 **Watch:** *Echinerpeton*'s synapsid membership is doubted and Benson (2012) treats it as a wildcard taxon. **No synapsid skin is known at this date** — integument is inference by bracketing, not evidence. The sail-backed silhouette everyone pictures is *Dimetrodon*, tens of millions of years later.
 
 ```
-Museum specimen illustration of an early synapsid, a carnivorous land
-vertebrate with monitor-lizard proportions. Scientific reconstruction,
-anatomically plausible, not fantasy. Single soft key light from upper left,
-low warm fill, no rim lighting. Muted warm-neutral palette: bone, ochre,
-umber, slate grey, desaturated. Three-quarter view, subject centred, full
-body within frame with generous margin. Isolated on a pure black
-background. Matte finish, fine detail, restrained. No dramatic lighting,
-no glow.
+A carnivorous land vertebrate with monitor-lizard proportions and a single
+opening in the skull behind each eye socket, its back running smooth and
+level from neck to tail.
 
-Reconstruction constrained by known fossil material: Archaeothyris
-florensis, Joggins, Nova Scotia, approximately 306 million years old. A
-single opening in the skull behind each eye socket. Largely uniform sharp
-teeth but with one pair of enlarged canines. Jaws that gape wider than those
-of contemporary reptiles. Monitor-lizard-like body proportions. A sprawling
-limb posture, the limbs articulating out to the side at shoulder and hip.
-First toe smaller than the second. A land animal, not a semi-aquatic one. Do
-not draw a sail or elongated spines along the back: that belongs to a later
-and separate lineage. No skin is known for any synapsid at this date, so
-keep the body covering plain and unspecific.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Archaeothyris florensis, Joggins, Nova Scotia, approximately
+306 million years old. One opening sits in the skull behind each eye socket.
+The teeth are largely uniform and sharp, with one pair of enlarged canines,
+and the jaws gape wider than those of contemporary reptiles. The body has
+monitor-lizard proportions with a long tail. The limbs articulate out to the
+side at shoulder and hip in a sprawling posture, and the first toe is
+smaller than the second. The vertebral spines along the back are short and
+even in height, giving one smooth level profile from the neck to the base of
+the tail. The body covering is plain and unmarked.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal walks on all fours on dry land, seen in three-quarter view from
+the front and slightly above.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -458,35 +490,33 @@ No frame, no border, no matting.
 **Watch — the fur claim.** Fur is **not** directly evidenced at 225 Ma. Earliest confirmed mammalian fur is *Castorocauda* (~164 Ma) and *Megaconus* (~165 Ma), roughly **60 Myr after this node**. A 2020 study also infers a metabolism well below modern mammals at this grade, weakening the insulation argument. `src/data/lineage.ts` used to list "fur" among this node's gains; **corrected** — see §05 items 1–3.
 
 ```
-Museum specimen illustration of an early mammaliaform, a small shrew-like
-animal about 10 cm long. Scientific reconstruction, anatomically plausible,
-not fantasy. Single soft key light from upper left, low warm fill, no rim
-lighting. Muted warm-neutral palette: bone, ochre, umber, slate grey,
-desaturated. Three-quarter view, subject centred, full body within frame
-with generous margin. Isolated on a pure black background. Matte finish,
-fine detail, restrained. No dramatic lighting, no glow.
+A small shrew-shaped animal about 10 cm long before the tail, walking flat
+on the whole sole of each foot, its jaw carrying two joints at once.
 
-Reconstruction constrained by known fossil material: Morganucodon,
-approximately 205 million years old. Skull 2 to 3 cm long, body about 10 cm
-before the tail, shrew- or mouse-like, walking flat-footed on the whole
-sole, with a moderately long tail. The jaw joint is in transition: the
-modern mammalian contact is present but the ancestral reptilian jaw joint is
-still present alongside it, with reduced bones retained behind the main jaw
-bone, so this is not a fully modern mammalian jaw. Two tooth generations
-only. Molars with interlocking cusps for piercing and shear-cutting. An
-insect eater taking hard-shelled prey. Somewhat sprawling limbs. Fur is not
-evidenced at this date: the earliest confirmed mammalian fur is roughly 60
-million years younger. Do not render dense modern pelage; keep the body
-covering ambiguous and unemphasised.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Morganucodon, approximately 205 million years old. The skull
+is 2 to 3 cm long and the body about 10 cm before a moderately long tail.
+The jaw carries both joints side by side: the mammalian dentary-squamosal
+contact, and alongside it the ancestral reptilian joint, with reduced bones
+retained in a trough behind the main jaw bone. There are two tooth
+generations only. The molars carry interlocking cusps for piercing and
+shearing, suited to hard-shelled insects. The limbs are somewhat sprawling.
+The body covering is plain and smooth, rendered as one even surface without
+individual hairs.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal stands on all fours, flat-footed on the whole sole, head lowered
+slightly as if foraging, seen in three-quarter view from the front.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -498,31 +528,31 @@ No frame, no border, no matting.
 **Watch — the node label was wrong at this date, and is now fixed.** 160 Ma is the **Eutheria/Metatheria split**, the placental *stem*; crown Placentalia's fossil range is 67.3–0 Ma. `lineage.ts`'s own note already conceded the crown radiation is ~90–100 Ma while the rendered name went on saying Placentalia; the node is now named Eutheria — see §05 items 4–6. King & Beck (2020) also suggest *Juramaia* may be Early Cretaceous rather than Jurassic, and Sweetman et al. (2017) recover it outside Eutheria entirely.
 
 ```
-Museum specimen illustration of an early eutherian mammal weighing about 15
-grams. Scientific reconstruction, anatomically plausible, not fantasy.
-Single soft key light from upper left, low warm fill, no rim lighting. Muted
-warm-neutral palette: bone, ochre, umber, slate grey, desaturated.
-Three-quarter view, subject centred, full body within frame with generous
-margin. Isolated on a pure black background. Matte finish, fine detail,
-restrained. No dramatic lighting, no glow.
+A shrew-sized tree-dwelling mammal weighing about 15 grams, with a pair of
+slender bones projecting forward from the front of the pelvis.
 
-Reconstruction constrained by known fossil material: Juramaia sinensis,
-Liaoning, approximately 160 million years old. 15 to 17 grams, shrew-like,
-with forelimb bones showing climbing adaptations, so a tree-dwelling animal.
-The better-preserved close relative Eomaia scansoria adds: about 10 cm long,
-20 to 25 grams, with preserved hair traces, and epipubic bones projecting
-forward from the pelvis — bones absent in all true placental mammals —
-implying a narrow birth canal and tiny, poorly developed newborns. Do not
-draw a modern placental-grade body.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Juramaia sinensis, Liaoning, approximately 160 million years
+old, with detail from the better-preserved close relative Eomaia scansoria.
+The animal weighs 15 to 17 grams and is shrew-shaped, with forelimb bones
+built for climbing. Eomaia adds: about 10 cm long, 20 to 25 grams, with
+preserved hair traces, and a pair of epipubic bones projecting forward from
+the front of the pelvis. The hips are narrow and the belly is slender to
+match, the pelvic opening small.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal is climbing, gripping a narrow branch with all four feet, its
+body held along the branch, seen from the side and slightly above.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -534,36 +564,33 @@ No frame, no border, no matting.
 **Watch — this node's date is not a primate date.** The 80.7 Ma figure in `src/data/lineage.ts` is the origin of **Euarchontoglires** (Foley et al. 2023), the split where rodents and rabbits leave; crown Primates is ~64–62 Ma on comparable evidence. Everything a reader pictures at "the first primate" — forward-facing eyes, a nail on every finger — is 20–25 Myr younger than this plate. *Purgatorius* has no known skull and no known body: the ankle is the only postcranial evidence there is. The node has been renamed from "The first primate" and its trait claim rewritten as a result — see §05 items 7–8.
 
 ```
-Museum specimen illustration of an early euarchontan mammal, a small
-tree-dwelling animal about the size of a tree shrew. Scientific
-reconstruction, anatomically plausible, not fantasy. Single soft key light
-from upper left, low warm fill, no rim lighting. Muted warm-neutral palette:
-bone, ochre, umber, slate grey, desaturated. Three-quarter view, subject
-centred, full body within frame with generous margin. Isolated on a pure
-black background. Matte finish, fine detail, restrained. No dramatic
-lighting, no glow.
+A small tree-dwelling mammal about the size of a tree shrew, with long
+slender fingers and toes and its eyes set on the sides of the head, looking
+outward to either side.
 
-Reconstruction constrained by known fossil material: Purgatorius,
-approximately 65 million years old, known only from teeth, jaw fragments and
-isolated ankle bones. Those ankle bones show a mobile joint of the kind
-found in tree-dwelling relatives, so depict an animal at home in branches;
-no skull and no body are preserved for it. The body plan therefore follows
-the younger relative Carpolestes simpsoni, approximately 56 million years
-old and about 100 grams, roughly tree-shrew sized: long fingers and toes,
-relatively short claws on the digits, and one opposable big toe bearing a
-flat nail instead of a claw. Eyes set on the sides of the head, and hind
-limbs not specialised for leaping. Do not give every digit a nail and do not
-draw converged, forward-facing eyes — both belong to later primates, not to
-this grade.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Purgatorius, approximately 65 million years old, and by the
+younger relative Carpolestes simpsoni, approximately 56 million years old
+and about 100 grams. The ankle joint is mobile, of the kind found in
+tree-dwelling relatives. The fingers and toes are long, with relatively
+short claws. One opposable big toe on each foot carries a flat nail; every
+other digit ends in a short curved claw. The eyes sit on the sides of the
+head with a wide view to each side. The hind limbs are built for climbing
+and gripping.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal grips a slender branch with hands and feet, its body held along
+the branch, head turned toward the viewer in three-quarter view.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -575,31 +602,31 @@ No frame, no border, no matting.
 **Watch:** *Archicebus* sits on the **tarsier** side of the split, not yours — it is a depiction of a cousin, and the caption has to say so. Its eye sockets are **small**, so do not reach for the enormous nocturnal eyes of a living tarsier; that animal is 55 Myr of its own evolution away. Springer et al. 2012 put crown Primates at 71–63 Ma, so this node sits at the old edge of the published range rather than the middle of it.
 
 ```
-Museum specimen illustration of an early haplorhine primate weighing about
-20 to 30 grams. Scientific reconstruction, anatomically plausible, not
-fantasy. Single soft key light from upper left, low warm fill, no rim
-lighting. Muted warm-neutral palette: bone, ochre, umber, slate grey,
-desaturated. Three-quarter view, subject centred, full body within frame
-with generous margin. Isolated on a pure black background. Matte finish,
-fine detail, restrained. No dramatic lighting, no glow.
+A very small slender primate weighing about 20 to 30 grams, with small eye
+sockets in proportion to a daytime animal and a markedly elongated heel
+bone.
 
-Reconstruction constrained by known fossil material: Archicebus achilles,
-Hubei Province, China, approximately 55 million years old, a nearly complete
-and partly articulated skeleton. An adult of about 20 to 30 grams, slender
-and very small. Small eye sockets, not the enlarged eyes of a nocturnal
-animal. A markedly elongated heel bone. Narrow feet with grasping toes,
-closer in build to a monkey's foot than to a living tarsier's. Do not draw
-the very large eyes of a modern tarsier: this animal's orbits are small, and
-that is the single most-copied error at this node.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Archicebus achilles, Hubei Province, China, approximately 55
+million years old, known from a nearly complete and partly articulated
+skeleton. The adult weighs 20 to 30 grams and is slender throughout. The eye
+sockets are small relative to the skull. The heel bone is long. The feet are
+narrow with grasping toes, closer in build to a monkey's foot than to a
+living tarsier's.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal clings upright to a slender vertical stem, gripping with both
+hands and both feet, head turned toward the viewer in three-quarter view.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -611,33 +638,32 @@ No frame, no border, no matting.
 **Watch — the node's stored date was impossible, and is now fixed.** `src/data/lineage.ts` had this node at **40 Ma**, which put the tarsier/anthropoid split *younger than its own fossils*: *Archicebus* (tarsier side) is 55 Ma and *Eosimias* (anthropoid side) is 45 Ma. Now 55 Ma, per Springer et al. 2012's 58–50 Ma — see §05 item 9. Beyond the date, this is a dentition-only anchor: everything but the teeth and a few foot bones is extrapolation.
 
 ```
-Museum specimen illustration of an early simian primate weighing about 100
-grams. Scientific reconstruction, anatomically plausible, not fantasy.
-Single soft key light from upper left, low warm fill, no rim lighting. Muted
-warm-neutral palette: bone, ochre, umber, slate grey, desaturated.
-Three-quarter view, subject centred, full body within frame with generous
-margin. Isolated on a pure black background. Matte finish, fine detail,
-restrained. No dramatic lighting, no glow.
+A small tree-dwelling primate weighing about 100 grams, with a
+forward-projecting muzzle and a plain simple face.
 
-Reconstruction constrained by known fossil material: Eosimias sinensis,
-Jiangsu Province, China, approximately 45 million years old, known
-essentially from jaws and teeth. The holotype is the right half of a lower
-jaw carrying the last premolar and the first two molars, with a lower dental
-formula of two incisors, one canine, three premolars and three molars.
-Estimated body mass 100 to 200 grams. No skull and almost no skeleton are
-preserved, so keep the body a small, generalised, four-footed tree-dweller
-and keep the face plain and unspecific: do not draw the flat forward-facing
-face of a later monkey, and do not elaborate the hands, feet or tail beyond
-a generic small arboreal primate.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Eosimias sinensis, Jiangsu Province, China, approximately 45
+million years old, known essentially from jaws and teeth. The holotype is
+the right half of a lower jaw carrying the last premolar and the first two
+molars, with a lower dental formula of two incisors, one canine, three
+premolars and three molars on each side. Body mass is 100 to 200 grams. The
+muzzle projects forward and the face is plain and simple. The hands, feet
+and tail are those of a generic small four-footed tree-dweller, average in
+every proportion.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal moves on all fours along the top of a slender branch, tail
+trailing behind it, seen from the side and slightly above.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -649,32 +675,32 @@ No frame, no border, no matting.
 **Watch:** the anchor is a jaw, so everything below the chin comes from a genus 7–10 Myr younger. *Ekembo*'s body is **monkey-like** — an above-branch quadruped — and tailless (its sacrum could not have carried one). The modern ape silhouette (long suspensory arms, knuckle-walking) is tens of millions of years later and belongs to other lineages; it is the easiest wrong image in this half of the set.
 
 ```
-Museum specimen illustration of an early ape. Scientific reconstruction,
-anatomically plausible, not fantasy. Single soft key light from upper left,
-low warm fill, no rim lighting. Muted warm-neutral palette: bone, ochre,
-umber, slate grey, desaturated. Three-quarter view, subject centred, full
-body within frame with generous margin. Isolated on a pure black
-background. Matte finish, fine detail, restrained. No dramatic lighting,
-no glow.
+An early ape with monkey-like body proportions, its arms and legs of similar
+length, and a smooth rounded rump where the body ends.
 
-Reconstruction constrained by known fossil material: Rukwapithecus fleaglei,
-Tanzania, approximately 25 million years old, known from a single partial
-lower jaw carrying four teeth and nothing else. The body therefore follows
-Ekembo, Kenya, approximately 20 to 17 million years old: monkey-like body
-proportions, an arboreal quadruped that walks along the tops of branches
-rather than hanging beneath them, powerful grasping hands and feet, a
-flexible back, and no tail — the sacrum shows the tail was already gone. Do
-not draw long suspensory arms, do not draw knuckle-walking, and do not draw
-anything resembling a chimpanzee.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Rukwapithecus fleaglei, Tanzania, approximately 25 million
+years old, known from a single partial lower jaw carrying four teeth, with
+the body following Ekembo, Kenya, approximately 20 to 17 million years old.
+The body proportions are monkey-like, the arms and legs of similar length.
+The hands and feet are powerful and grasping. The back is flexible and
+carried level. The sacrum ends bluntly and the rump is smooth and rounded,
+the body finishing there.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal walks on all fours along the top of a stout branch, palms and
+soles flat on the bark, back held level and hips carried beneath the body,
+seen from the side and slightly above.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -686,33 +712,33 @@ No frame, no border, no matting.
 **Watch:** the cranium is **crushed and distorted**, and there is essentially no body. Whether the animal walked upright is unresolved — the forward-set foramen magnum is read as evidence for it, an associated femur has been read against it — and whether it is a hominin at all is disputed. Endocranial volume is ~360–380 cc, chimpanzee-sized. **Do not let the picture settle the argument**: a confidently striding upright figure here is an assertion the fossil does not make.
 
 ```
-Museum specimen illustration of an early hominin, a chimpanzee-sized ape.
-Scientific reconstruction, anatomically plausible, not fantasy. Single soft
-key light from upper left, low warm fill, no rim lighting. Muted
-warm-neutral palette: bone, ochre, umber, slate grey, desaturated.
-Three-quarter view, subject centred, full body within frame with generous
-margin. Isolated on a pure black background. Matte finish, fine detail,
-restrained. No dramatic lighting, no glow.
+A chimpanzee-sized ape with a heavy continuous brow ridge above a relatively
+flat face, its braincase about the size of a chimpanzee's.
 
-Reconstruction constrained by known fossil material: Sahelanthropus
-tchadensis, Chad, approximately 7 to 6 million years old, known from a
-crushed and distorted cranium and a few jaw fragments. Braincase volume
-about 360 to 380 cubic centimetres, comparable to a chimpanzee. A heavy
-continuous brow ridge above a relatively flat face. Small canines and a
-U-shaped tooth row. A long, narrow skull base, with the opening for the
-spinal cord set well forward. No body is preserved: keep the limbs and
-posture generic and ape-like, and do not depict a striding upright walker or
-a human stance — whether this animal walked on two legs is unresolved and
-the image must not settle it. No skin or hair is known at this date.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by Sahelanthropus tchadensis, Chad, approximately 7 to 6 million
+years old, known from a cranium and a few jaw fragments. The braincase holds
+about 360 to 380 cubic centimetres. A heavy continuous brow ridge runs above
+the eyes. The canines are small and the tooth row is U-shaped. The skull
+base is long and narrow, with the opening for the spinal cord set well
+forward. No body is preserved, so the trunk and limbs are those of a
+generalised ape of that size, and the body covering is plain and unmarked.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The animal is seated on the ground with its legs folded and its trunk
+upright, hands resting on its knees, seen in three-quarter view. This
+resting pose is deliberate: how this animal moved is unresolved, and a
+seated figure makes no claim either way.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -724,33 +750,32 @@ No frame, no border, no matting.
 **Watch:** LD 350-1 mixes derived *Homo* features with primitive *Australopithecus* ones, which is exactly why it is interesting and exactly why nothing can be drawn confidently around it. Everything above and below that jaw is borrowed from australopith material. This is also the node where the *March of Progress* silhouette tries to insert itself: it is a 1965 illustration, not evidence, and reproducing it would hand the page the ladder picture it exists to refute.
 
 ```
-Museum specimen illustration of an early member of the genus Homo.
-Scientific reconstruction, anatomically plausible, not fantasy. Single soft
-key light from upper left, low warm fill, no rim lighting. Muted
-warm-neutral palette: bone, ochre, umber, slate grey, desaturated.
-Three-quarter view, subject centred, full body within frame with generous
-margin. Isolated on a pure black background. Matte finish, fine detail,
-restrained. No dramatic lighting, no glow.
+An early member of the genus Homo at australopith grade: a small low
+braincase, a forward-projecting face, and empty hands.
 
-Reconstruction constrained by known fossil material: LD 350-1, Ledi-Geraru,
-Ethiopia, dated between 2.80 and 2.75 million years old, which is the left
-half of a lower jaw carrying five teeth and is the only material of this
-genus at this date. It combines features found in later Homo with primitive
-features found in early Australopithecus. Nothing else is preserved, so
-head, braincase and body must stay at the australopith grade they are
-extrapolated from: a small braincase, a projecting face, and body
-proportions closer to an australopith than to a modern human. Do not draw a
-large modern braincase, do not draw an upright striding modern silhouette,
-and do not add fire, clothing, or tools held in the hand.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by LD 350-1, Ledi-Geraru, Ethiopia, dated between 2.80 and 2.75
+million years old, which is the left half of a lower jaw carrying five teeth
+and is the only material of this genus at this date. It combines features
+found in later Homo with primitive features found in early Australopithecus.
+Everything else follows australopith material: the braincase is small and
+low, the face projects forward, the shoulders are narrow, and the limb
+proportions are those of an australopith. The hands are empty and the body
+is bare.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The figure stands still and upright on level ground, arms hanging relaxed at
+its sides, seen in three-quarter view.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -762,32 +787,32 @@ No frame, no border, no matting.
 **Watch:** the finding that makes this plate worth drawing is a **mismatch**. The face already falls within the range of people alive today; the braincase is still long, low and archaic, because brain *shape* modernised later. Draw a present-day head and the one fact the specimen carries is gone. Skin, hair and eye colour are unconstrained here as everywhere else in this set.
 
 ```
-Museum specimen illustration of an early Homo sapiens. Scientific
-reconstruction, anatomically plausible, not fantasy. Single soft key light
-from upper left, low warm fill, no rim lighting. Muted warm-neutral palette:
-bone, ochre, umber, slate grey, desaturated. Three-quarter view, subject
-centred, full body within frame with generous margin. Isolated on a pure
-black background. Matte finish, fine detail, restrained. No dramatic
-lighting, no glow.
+An early Homo sapiens with a face that would pass unremarked today, set
+beneath a braincase that is still long and low from front to back.
 
-Reconstruction constrained by known fossil material: the Jebel Irhoud
-crania, Morocco, approximately 300 thousand years old. A facial skeleton
-that falls within the range of people living today — short, and tucked under
-the braincase rather than projecting — combined with relatively large teeth
-and a braincase that is still long, low and elongated front to back rather
-than the rounded, globular shape of a living human head. Depict that
-mismatch plainly: a modern face on an archaic braincase. Do not draw a
-present-day human head, and do not commit to a skin, hair or eye colour,
-none of which is evidenced.
-Do not invent anatomy beyond what the specimen supports.
+Constrained by the Jebel Irhoud crania, Morocco, approximately 300 thousand
+years old. The facial skeleton falls within the range of people living
+today: short, and tucked beneath the braincase rather than projecting. The
+teeth are relatively large. The braincase runs long and low, extending well
+back behind the face, its greatest width low down and toward the rear, with
+the forehead only gently raised. Skin and hair are carried in the same muted
+neutral tones as the rest of the palette.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The head and shoulders are shown in three-quarter view, turned so that the
+modern face and the long low braincase both read at once, the expression
+neutral.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -817,26 +842,33 @@ refute. Where that trap exists it is called out per node below.
 **Watch:** LUCA is **not the first life** and not an individual: it is the last population everything alive descends from, and it already had a substantial genome and a working translation system. Do not draw a primordial blob, and do not draw a nucleus — that arrives at node 2, 2.3 billion years later.
 
 ```
-Museum specimen illustration of a single generalised cell without a nucleus,
-the last universal common ancestor. Scientific reconstruction, anatomically
-plausible, not fantasy. Single soft key light from upper left, low warm
-fill, no rim lighting. Muted warm-neutral palette: bone, ochre, umber, slate
-grey, desaturated. Three-quarter view, subject centred, full body within
-frame with generous margin. Isolated on a pure black background. Matte
-finish, fine detail, restrained. No dramatic lighting, no glow.
+A single living microorganism, greatly magnified — one soft rounded cell
+with a flexible outer membrane, filling most of the frame.
 
-Schematic reconstruction of an inferred organism — no fossil constrains this
-form. Simple, generalised morphology. Avoid specific-looking detail that would
-imply evidence that does not exist.
-Do not draw a nucleus or any internal compartment.
+This is a living organism, soft-bodied and flexible, with a yielding
+membrane edge that bends and varies along its outline. The body is
+translucent, its interior faintly visible through the surface. Every edge is
+soft. The form is generalised and simple — no fossil constrains its
+appearance, so avoid specific-looking detail that would imply evidence which
+does not exist.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The membrane curves gently in and out along its length, thicker in some
+places than others, the way a soap bubble or a living cell wall does. The
+interior is faintly and evenly granular throughout, with no separate
+compartment, no nucleus, and no structure at the centre. The whole form is
+slightly irregular — never a perfect circle or disc.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -848,28 +880,33 @@ No frame, no border, no matting.
 **Watch:** current phylogeny has eukaryotes arising from *within* Asgard archaea, so the subject is an archaeal cell **that has taken a bacterium inside it** — not an archaeon standing next to one. The timing is disputed across roughly 1.1–2.3 Ga, and which archaeal lineage is the sister group is still argued; none of that constrains the picture, which is the point.
 
 ```
-Museum specimen illustration of a single generalised cell with a nucleus and
-one smaller captured bacterial cell inside it. Scientific reconstruction,
-anatomically plausible, not fantasy. Single soft key light from upper left,
-low warm fill, no rim lighting. Muted warm-neutral palette: bone, ochre,
-umber, slate grey, desaturated. Three-quarter view, subject centred, full
-body within frame with generous margin. Isolated on a pure black
-background. Matte finish, fine detail, restrained. No dramatic lighting,
-no glow.
+A single living microorganism, greatly magnified — one soft rounded cell
+holding a smaller oval body inside it.
 
-Schematic reconstruction of an inferred organism — no fossil constrains this
-form. Simple, generalised morphology. Avoid specific-looking detail that would
-imply evidence that does not exist.
-Do not draw a textbook cell diagram with every organelle rendered; two
-structures only.
+This is a living organism, soft-bodied and flexible, with a yielding
+membrane edge that bends and varies along its outline. The body is
+translucent, its interior faintly visible through the surface. Every edge is
+soft. The form is generalised and simple — no fossil constrains its
+appearance, so avoid specific-looking detail that would imply evidence which
+does not exist.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+Inside the cell sit exactly two things: one rounded nucleus, and one smaller
+oval body with its own smooth outer edge, clearly separate and held within
+the surrounding fluid. The rest of the interior is faintly and evenly
+granular. The outline bends gently in and out along its length, thicker in
+some places than others, and the whole form is slightly irregular.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -881,26 +918,34 @@ No frame, no border, no matting.
 **Watch:** do not draw a recognisable modern amoeba. A living amoeba has had 1.6 billion years of its own since this point, and drawing one implies the ancestor looked like its descendant.
 
 ```
-Museum specimen illustration of a single generalised cell with a soft,
-irregular, lobed outline. Scientific reconstruction, anatomically plausible,
-not fantasy. Single soft key light from upper left, low warm fill, no rim
-lighting. Muted warm-neutral palette: bone, ochre, umber, slate grey,
-desaturated. Three-quarter view, subject centred, full body within frame
-with generous margin. Isolated on a pure black background. Matte finish,
-fine detail, restrained. No dramatic lighting, no glow.
+A single living microorganism, greatly magnified — one soft cell whose
+outline bulges into a few broad rounded lobes of unequal size.
 
-Schematic reconstruction of an inferred organism — no fossil constrains this
-form. Simple, generalised morphology. Avoid specific-looking detail that would
-imply evidence that does not exist.
-Do not draw a recognisable modern amoeba.
+This is a living organism, soft-bodied and flexible, with a yielding
+membrane edge that bends and varies along its outline. The body is
+translucent, its interior faintly visible through the surface. Every edge is
+soft. The form is generalised and simple — no fossil constrains its
+appearance, so avoid specific-looking detail that would imply evidence which
+does not exist.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The outline carries two or three broad soft lobes, each a different size
+from the others, changing gradually along its length so that no part of the
+edge repeats another. The interior is faintly and evenly granular
+throughout, with no separate compartment and nothing at the centre. The
+whole form is generalised and slightly lopsided, matching no living
+microorganism in particular.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -912,27 +957,33 @@ No frame, no border, no matting.
 **Watch:** the one trait worth showing — the single flagellum trailing at the **rear**, the same layout your sperm still uses — is inferred from living descendants, not observed in any fossil. Show one flagellum, at the back, and nothing else specific.
 
 ```
-Museum specimen illustration of a single generalised cell with one long
-flagellum trailing from the rear. Scientific reconstruction, anatomically
-plausible, not fantasy. Single soft key light from upper left, low warm
-fill, no rim lighting. Muted warm-neutral palette: bone, ochre, umber, slate
-grey, desaturated. Three-quarter view, subject centred, full body within
-frame with generous margin. Isolated on a pure black background. Matte
-finish, fine detail, restrained. No dramatic lighting, no glow.
+A single living microorganism, greatly magnified — one soft rounded cell
+with a single long flagellum trailing from its rear.
 
-Schematic reconstruction of an inferred organism — no fossil constrains this
-form. Simple, generalised morphology. Avoid specific-looking detail that would
-imply evidence that does not exist.
-Exactly one flagellum, and it trails behind the cell rather than pulling
-from the front.
+This is a living organism, soft-bodied and flexible, with a yielding
+membrane edge that bends and varies along its outline. The body is
+translucent, its interior faintly visible through the surface. Every edge is
+soft. The form is generalised and simple — no fossil constrains its
+appearance, so avoid specific-looking detail that would imply evidence which
+does not exist.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+Exactly one flagellum leaves the cell, and it leaves from the rear,
+streaming out behind the body in a long smooth curve as though the cell were
+being pushed from behind. The front of the cell is smooth and bare. The
+interior is faintly and evenly granular throughout, and the outline bends
+gently in and out along its length.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -944,27 +995,33 @@ No frame, no border, no matting.
 **Watch — two traps at this node.** The obvious picture is a choanoflagellate, and a living choanoflagellate is a cousin at the end of its own billion-year line, not a portrait of the ancestor. Worse, the **collar** everyone would draw is not safely attributable here: it is shared by choanoflagellates and sponge cells, but filastereans, which are also holozoans, have nothing like it. Leave the collar out. The node's date also carries a genuine method-dependent spread of ~1.0 versus ~1.77 Ga.
 
 ```
-Museum specimen illustration of a single generalised cell with one flagellum
-and no other specialised structures. Scientific reconstruction, anatomically
-plausible, not fantasy. Single soft key light from upper left, low warm
-fill, no rim lighting. Muted warm-neutral palette: bone, ochre, umber, slate
-grey, desaturated. Three-quarter view, subject centred, full body within
-frame with generous margin. Isolated on a pure black background. Matte
-finish, fine detail, restrained. No dramatic lighting, no glow.
+A single living microorganism, greatly magnified — one soft rounded cell
+with a single flagellum and a smooth unbroken membrane.
 
-Schematic reconstruction of an inferred organism — no fossil constrains this
-form. Simple, generalised morphology. Avoid specific-looking detail that would
-imply evidence that does not exist.
-Do not draw a collar of projections around the flagellum, and do not draw a
-choanoflagellate.
+This is a living organism, soft-bodied and flexible, with a yielding
+membrane edge that bends and varies along its outline. The body is
+translucent, its interior faintly visible through the surface. Every edge is
+soft. The form is generalised and simple — no fossil constrains its
+appearance, so avoid specific-looking detail that would imply evidence which
+does not exist.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The membrane runs smooth and continuous the whole way around the cell,
+including where the flagellum leaves it, meeting the flagellum in one plain
+unbroken join. The surface is bare over its entire length. The interior is
+faintly and evenly granular throughout, and the outline is slightly
+irregular, the whole form simple and without projections of any kind.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -976,28 +1033,33 @@ No frame, no border, no matting.
 **Watch:** do not draw a sponge. Sponges are the cousins who leave at the *next* node, and a living sponge is a modern animal, not a fossil of your ancestor.
 
 ```
-Museum specimen illustration of a simple generalised multicellular animal, a
-small rounded cluster of similar cells with no organs. Scientific
-reconstruction, anatomically plausible, not fantasy. Single soft key light
-from upper left, low warm fill, no rim lighting. Muted warm-neutral palette:
-bone, ochre, umber, slate grey, desaturated. Three-quarter view, subject
-centred, full body within frame with generous margin. Isolated on a pure
-black background. Matte finish, fine detail, restrained. No dramatic
-lighting, no glow.
+A simple living multicellular organism, greatly magnified — a small rounded
+cluster of similar soft cells held together as one mass.
 
-Schematic reconstruction of an inferred organism — no fossil constrains this
-form. Simple, generalised morphology. Avoid specific-looking detail that would
-imply evidence that does not exist.
-Do not draw a sponge, and do not draw any opening, pore or symmetry that
-implies a body plan.
+This is a living organism, soft-bodied and flexible, with a yielding
+membrane edge that bends and varies along its outline. The body is
+translucent, its interior faintly visible through the surface. Every edge is
+soft. The form is generalised and simple — no fossil constrains its
+appearance, so avoid specific-looking detail that would imply evidence which
+does not exist.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The cells are of similar size and loosely packed, their individual outlines
+showing faintly through the translucent surface. The surface of the cluster
+is continuous and unbroken all over. The whole mass is slightly lopsided,
+its arrangement irregular and repeating nowhere, so that no end reads as a
+front or a back.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -1009,26 +1071,33 @@ No frame, no border, no matting.
 **Watch:** the trait here is tissues and nerves, which are internal and cannot be drawn honestly from outside. Do not draw a jellyfish — cnidarians leave at the *next* node down, and drawing one here hands away two nodes at once.
 
 ```
-Museum specimen illustration of a simple generalised animal with a soft
-two-layered body wall. Scientific reconstruction, anatomically plausible,
-not fantasy. Single soft key light from upper left, low warm fill, no rim
-lighting. Muted warm-neutral palette: bone, ochre, umber, slate grey,
-desaturated. Three-quarter view, subject centred, full body within frame
-with generous margin. Isolated on a pure black background. Matte finish,
-fine detail, restrained. No dramatic lighting, no glow.
+A simple living sea animal, greatly magnified — a small soft sac with a
+smooth continuous outline and a body wall two thin layers thick.
 
-Schematic reconstruction of an inferred organism — no fossil constrains this
-form. Simple, generalised morphology. Avoid specific-looking detail that would
-imply evidence that does not exist.
-Do not draw a jellyfish, tentacles, or radial symmetry.
+This is a living organism, soft-bodied and flexible, with a yielding
+membrane edge that bends and varies along its outline. The body is
+translucent, its interior faintly visible through the surface. Every edge is
+soft. The form is generalised and simple — no fossil constrains its
+appearance, so avoid specific-looking detail that would imply evidence which
+does not exist.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The body wall is built from two thin layers, faintly visible through the
+translucent surface. The outline runs smooth and continuous the whole way
+round, and the surface is bare and even from end to end. The whole form is
+lopsided and irregular, longer on one side than the other, so that no part
+of it answers to another across any line.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -1040,27 +1109,33 @@ No frame, no border, no matting.
 **Watch:** the temptation is to draw *Ikaria*'s tapered grain-of-rice outline as though it were the ancestor. It is a much younger animal known from a dent in sandstone. Keep the subject generic: small, soft, front and back, no hard parts.
 
 ```
-Museum specimen illustration of a small soft-bodied animal with bilateral
-symmetry, a distinct front end and a distinct back end. Scientific
-reconstruction, anatomically plausible, not fantasy. Single soft key light
-from upper left, low warm fill, no rim lighting. Muted warm-neutral palette:
-bone, ochre, umber, slate grey, desaturated. Three-quarter view, subject
-centred, full body within frame with generous margin. Isolated on a pure
-black background. Matte finish, fine detail, restrained. No dramatic
-lighting, no glow.
+A small living sea animal with a distinct front end and back end, its body
+soft and smooth from one end to the other.
 
-Schematic reconstruction of an inferred organism — no fossil constrains this
-form. Simple, generalised morphology. Avoid specific-looking detail that would
-imply evidence that does not exist.
-No eyes, no appendages, no segmentation, and no hard parts of any kind.
+This is a living organism, soft-bodied and flexible, with a yielding
+membrane edge that bends and varies along its outline. The body is
+translucent, its interior faintly visible through the surface. Every edge is
+soft. The form is generalised and simple — no fossil constrains its
+appearance, so avoid specific-looking detail that would imply evidence which
+does not exist.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The front end is slightly broader and blunter than the back, which tapers to
+a rounded tip, and the two halves of the body match each other across a
+single line running head to tail. The surface is smooth and unbroken over
+its whole length, bare and even throughout, and the body is uniformly soft
+from end to end. The outline varies gently along its length.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -1072,28 +1147,32 @@ No frame, no border, no matting.
 **Watch:** a search for "earliest deuterostome" will still return *Saccorhytus*, spiky mouth and all. It is not one. This node's trait — which end of the embryo becomes the mouth — is a developmental fact and cannot be shown in a portrait at all, so do not try to imply it.
 
 ```
-Museum specimen illustration of a small soft-bodied marine animal with a
-simple gut running from one end of the body to the other. Scientific
-reconstruction, anatomically plausible, not fantasy. Single soft key light
-from upper left, low warm fill, no rim lighting. Muted warm-neutral palette:
-bone, ochre, umber, slate grey, desaturated. Three-quarter view, subject
-centred, full body within frame with generous margin. Isolated on a pure
-black background. Matte finish, fine detail, restrained. No dramatic
-lighting, no glow.
+A small living sea animal, soft and smoothly rounded, with a simple gut
+running the length of its body.
 
-Schematic reconstruction of an inferred organism — no fossil constrains this
-form. Simple, generalised morphology. Avoid specific-looking detail that would
-imply evidence that does not exist.
-Do not draw a spiny or wrinkled sack with a large mouth; that reconstruction
-belongs to a different branch of the tree.
+This is a living organism, soft-bodied and flexible, with a yielding
+membrane edge that bends and varies along its outline. The body is
+translucent, its interior faintly visible through the surface. Every edge is
+soft. The form is generalised and simple — no fossil constrains its
+appearance, so avoid specific-looking detail that would imply evidence which
+does not exist.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The body is a smooth soft tube, evenly rounded along its length, with one
+small plain opening at each end and the gut faintly visible between them
+through the translucent body wall. The surface is even and unbroken all
+over, and the outline curves gently throughout, without an angle anywhere.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
@@ -1105,27 +1184,33 @@ No frame, no border, no matting.
 **Watch:** this is a molecular node in the middle of the Cretaceous with nothing preserved at it. Whatever gets drawn will inevitably look like some small modern mammal, which is exactly why the bucket-B tag matters here more than anywhere else in the second half of the set. Do not draw a recognisable shrew, rat, hedgehog or carnivoran: every one of those is a living cousin, and most of them leave at this very node.
 
 ```
-Museum specimen illustration of a small generalised placental-grade mammal
-about the size of a mouse. Scientific reconstruction, anatomically
-plausible, not fantasy. Single soft key light from upper left, low warm
-fill, no rim lighting. Muted warm-neutral palette: bone, ochre, umber, slate
-grey, desaturated. Three-quarter view, subject centred, full body within
-frame with generous margin. Isolated on a pure black background. Matte
-finish, fine detail, restrained. No dramatic lighting, no glow.
+A small living four-footed mammal about the size of a mouse, plain and
+generalised in every feature.
 
-Schematic reconstruction of an inferred organism — no fossil constrains this
-form. Simple, generalised morphology. Avoid specific-looking detail that would
-imply evidence that does not exist.
-Do not draw a recognisable living animal: no shrew, no rat, no hedgehog, no
-squirrel. Keep the muzzle, ears, tail and feet unspecific.
+This is a living animal, warm-bodied and soft, its outline yielding and
+varying along its length the way a living body does. Every edge is soft. The
+form is generalised and simple — no fossil constrains its appearance, so
+avoid specific-looking detail that would imply evidence which does not
+exist.
 
-No text, no labels, no captions, no watermarks, no signature.
-No scale bars, no rulers, no measurement annotations.
-No human hands, no human figures for scale.
-No cartoon styling, no anime, no cel shading.
-No neon, no bioluminescent glow, no lens flare, no bokeh.
-No busy background, no environment, no scenery, no vignette.
-No frame, no border, no matting.
+The muzzle is short and plain, the ears small and simple, the tail moderate
+and unremarkable, and the feet plain with short toes. Every proportion is
+average for a small mammal, matching no living species in particular. The
+coat is even and unmarked over the whole body, one plain tone throughout.
+The animal stands on all fours, head slightly raised, seen in three-quarter
+view from the front.
+
+Rendered as a soft-shaded naturalistic painting with smooth continuous tonal
+modelling, in the manner of modern palaeoart reconstruction. Muted warm-neutral
+palette: bone, ochre, umber, slate grey, desaturated. Single soft key light from
+upper left, low warm fill. Subject centred with generous margin on a flat pure
+black background. Restrained, fine detail, evenly lit, mid-to-light in overall
+value.
+
+No pen hatching, no ink linework, no watercolour wash, no visible paper texture.
+No text, labels, captions, scale bars or watermarks.
+No frame, border, decorative rim or mount.
+No environment, scenery, ground plane or cast shadow.
 ```
 
 ---
