@@ -301,6 +301,30 @@ nav[aria-label="Chapters"] {
   }
 }
 
+/* Time-scaled pacing (spec §04, docs/DESIGN.md §4). `--pace` is set inline
+   per section from src/pacing.ts — log10 of the elapsed time to the next
+   node, clamped to 40vh–220vh. It's a min-height, not a height, so a plate
+   whose text runs longer than its allotted time is never clipped; the
+   fallback value only applies if the inline property is missing. */
+.node-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--pace, 100vh);
+}
+
+/* A floor between sections for the case where a plate's own content
+   already exceeds its pacing space, so two sections can't ever touch. */
+.node-section + .node-section {
+  margin-top: 32px;
+}
+
+@media (width >= 720px) {
+  .node-section + .node-section {
+    margin-top: var(--s7);
+  }
+}
+
 .node-row {
   display: flex;
   flex-direction: column;
@@ -308,10 +332,7 @@ nav[aria-label="Chapters"] {
   max-width: calc(940px + var(--s7) + var(--s8));
   margin-inline: auto;
   gap: var(--s5);
-}
-
-.node-row + .node-row {
-  margin-top: 32px;
+  width: 100%;
 }
 
 @media (width >= 720px) {
@@ -319,10 +340,6 @@ nav[aria-label="Chapters"] {
     flex-direction: row-reverse;
     align-items: stretch;
     gap: var(--s7);
-  }
-
-  .node-row + .node-row {
-    margin-top: var(--s7);
   }
 }
 

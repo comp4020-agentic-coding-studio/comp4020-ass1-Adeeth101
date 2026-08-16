@@ -10,6 +10,7 @@
 
 import { LINEAGE, type LineageNode } from "./src/data/lineage";
 import { createLineage } from "./src/lineage-state";
+import { gapToNextMa, sectionHeightVh } from "./src/pacing";
 import { eraFor, formatAge, romanNumeral } from "./src/plate-format";
 
 function required<T>(value: T | null, selector: string): T {
@@ -34,17 +35,12 @@ const gaugeDateEl = required(document.querySelector<HTMLElement>("#gauge-date"),
 
 const state = createLineage(LINEAGE.map((node) => ({ id: node.id })));
 
-// Adaptive learning-mode pacing (docs/DESIGN.md §4): a node's row height is a
-// hand-set weight, not real elapsed time — nodes with more to say (a branch,
-// a "still with you" receipt) get more scroll distance, which reads as
-// "slower" purely through layout. This is why adaptive pacing needs no
+// Time-scaled pacing (docs/DESIGN.md §4): a section's height is the elapsed
+// time to the next node on a log10 scale, computed by the pure module in
+// src/pacing.ts. Layout is the only thing that changes — which node is
+// current still comes entirely from src/lineage-state.ts, so this needs no
 // custom scroll physics (docs/DESIGN.md §2).
-function weightFor(node: LineageNode): number {
-  let weight = 1;
-  if (node.branch.trim() !== "") weight += 0.4;
-  if (node.stillWithYou) weight += 0.9;
-  return weight;
-}
+const AGES = LINEAGE.map((node) => node.age);
 
 // Only one cousin branch in this dataset is genuinely extinct — every other
 // non-empty `branch` field (see src/data/lineage.ts) describes a lineage
@@ -143,10 +139,18 @@ for (const [index, node] of LINEAGE.entries()) {
 
   const row = document.createElement("div");
   row.className = "node-row";
-  row.style.setProperty("--weight", String(weightFor(node)));
   row.append(plate, diagram);
 
-  lineageEl.append(row);
+  // The pacing space sits on a wrapper rather than on the row itself: the
+  // row stretches its plate and branch diagram to a shared height, so a
+  // 218vh row would mean a 218vh-tall plate frame with text at the top.
+  // The wrapper centres a natural-height row inside the time-scaled space.
+  const section = document.createElement("div");
+  section.className = "node-section";
+  section.style.setProperty("--pace", `${sectionHeightVh(gapToNextMa(AGES, index)).toFixed(2)}vh`);
+  section.append(row);
+
+  lineageEl.append(section);
   plates.push(plate);
   rows.push(row);
   diagrams.push(diagram);
