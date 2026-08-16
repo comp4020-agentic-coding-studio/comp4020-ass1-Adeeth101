@@ -1,0 +1,141 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
+import { LINEAGE } from "../src/data/lineage";
+import { IMAGE_BUCKETS, type ImageBucket } from "../src/data/image-buckets";
+import { plateImage } from "../src/plate-image";
+
+// Written before src/plate-image.ts existed, and observed failing first.
+//
+// The contracts here are the ones that are expensive to discover late: an AI
+// reconstruction that ships without saying it is one, an image that appears
+// before its asset exists, or 28 images all fetched at once on a phone.
+// docs/IMAGE-STYLE.md §07 makes the labelling a hard rule rather than a
+// stylistic choice, so it belongs in a test.
+
+const TETRAPODA = { id: "tetrapoda", name: "The first tetrapod" };
+
+describe("plateImage", () => {
+  it("renders nothing at all when the asset does not exist yet", () => {
+    expect(plateImage(TETRAPODA, 3, undefined)).toBeNull();
+  });
+
+  it("renders nothing rather than an unlabelled AI image when the bucket is unknown", () => {
+    expect(plateImage({ id: "not-a-node", name: "Nothing" }, 3, "/x.webp")).toBeNull();
+  });
+
+  it("names the node and declares the image AI-generated in the alt text", () => {
+    const image = plateImage(TETRAPODA, 3, "/x.webp");
+    expect(image?.alt).toContain("The first tetrapod");
+    expect(image?.alt).toMatch(/AI-generated/i);
+  });
+
+  it("carries the evidence bucket in the visible tag, three ways", () => {
+    const a = plateImage({ id: "tetrapoda", name: "n" }, 1, "/x.webp");
+    const partial = plateImage({ id: "mammaliaformes", name: "n" }, 1, "/x.webp");
+    const b = plateImage({ id: "luca", name: "n" }, 1, "/x.webp");
+
+    expect(new Set([a?.tag, partial?.tag, b?.tag]).size).toBe(3);
+    expect(a?.tag).toMatch(/from fossil material/i);
+    expect(partial?.tag).toMatch(/partly/i);
+    expect(b?.tag).toMatch(/inferred/i);
+  });
+
+  it("says in the alt text, not only the visible tag, how much fossil evidence there is", () => {
+    expect(plateImage({ id: "luca", name: "LUCA" }, 1, "/x.webp")?.alt).toMatch(/no fossil/i);
+  });
+
+  it("loads the first plate eagerly and every other plate lazily", () => {
+    expect(plateImage(TETRAPODA, 0, "/x.webp")?.loading).toBe("eager");
+    for (const index of [1, 2, 14, 27]) {
+      expect(plateImage(TETRAPODA, index, "/x.webp")?.loading).toBe("lazy");
+    }
+  });
+});
+
+describe("IMAGE_BUCKETS", () => {
+  it("buckets every node that can carry an image, so an asset can never land unlabelled", () => {
+    for (const node of LINEAGE) {
+      if (node.id === "you") continue;
+      expect(IMAGE_BUCKETS[node.id], `${node.id}: no evidence bucket`).toBeDefined();
+    }
+  });
+
+  it("gives the You node no bucket, because it gets no image by design", () => {
+    expect(IMAGE_BUCKETS["you"]).toBeUndefined();
+  });
+
+  it("buckets nothing that is not a node in the lineage", () => {
+    const ids = new Set(LINEAGE.map((node) => node.id));
+    for (const id of Object.keys(IMAGE_BUCKETS)) {
+      expect(ids.has(id), `${id}: bucketed but not in the lineage`).toBe(true);
+    }
+  });
+
+  it("matches the counts recorded in docs/IMAGE-PROMPTS.md §01", () => {
+    const counts: Record<ImageBucket, number> = { A: 0, "A-partial": 0, B: 0 };
+    for (const bucket of Object.values(IMAGE_BUCKETS)) counts[bucket] += 1;
+    expect(counts).toEqual({ A: 8, "A-partial": 9, B: 10 });
+  });
+});
+
+// Asserted against the real stylesheet, the same way spec/era-palette.test.ts
+// checks the real token values rather than a copy of them. These three rules
+// are the ones that fail silently — the page still renders, it just renders
+// wrong — and two of them cannot be caught by reading a diff:
+//
+//   - drop `isolation`/the painted backdrop and every still becomes a black
+//     square, because .plate-in's dormant opacity isolates the blend group;
+//   - drop the media query and a 200px column is forced onto a 390px phone;
+//   - drop the max-width and a 1:1 still fills a phone screen on its own.
+//
+// The phone case is here rather than in the browser deliberately: this harness
+// could not change the viewport, so the contract is pinned at the source
+// instead of left unverified.
+describe("the image slot's stylesheet contract", () => {
+  const css = readFileSync(resolve(import.meta.dirname, "../styles.css"), "utf8").replace(
+    /\/\*[\s\S]*?\*\//g,
+    "",
+  );
+
+  // Brace-matched blocks, so "inside a media query" is a structural claim and
+  // not a guess from source order.
+  function blockOf(openerIndex: number): string {
+    const start = css.indexOf("{", openerIndex);
+    let depth = 0;
+    for (let i = start; i < css.length; i++) {
+      if (css[i] === "{") depth += 1;
+      if (css[i] === "}") {
+        depth -= 1;
+        if (depth === 0) return css.slice(start, i);
+      }
+    }
+    throw new Error("unbalanced braces in styles.css");
+  }
+
+  const wideBlocks = [...css.matchAll(/@media \(width >= 720px\)/g)].map((m) =>
+    blockOf(m.index),
+  );
+
+  it("composites the still with screen, which is what cancels the black backdrop", () => {
+    expect(css).toMatch(/\.plate-figure-img\s*\{[^}]*mix-blend-mode:\s*screen/);
+  });
+
+  it("isolates the figure and paints its own backdrop, so the blend cannot be orphaned", () => {
+    const figure = css.match(/\.plate-figure\s*\{[^}]*\}/)?.[0] ?? "";
+    expect(figure).toMatch(/isolation:\s*isolate/);
+    expect(figure).toMatch(/background:\s*var\(--bg-now/);
+    expect(css).toMatch(/\.plate-on \.plate-figure\s*\{[^}]*background:\s*var\(--surface\)/);
+  });
+
+  it("only gives the plate a second column above the 720px breakpoint", () => {
+    expect(css).toContain(".plate-in:has(.plate-figure)");
+    const inWideBlock = wideBlocks.some((block) => block.includes(".plate-in:has(.plate-figure)"));
+    expect(inWideBlock, "the two-column template escaped its media query").toBe(true);
+  });
+
+  it("caps the still's width below the breakpoint, so it cannot fill a phone screen", () => {
+    const narrow = css.slice(0, css.indexOf("@media (width >= 720px)", css.indexOf(".plate-figure-img")));
+    expect(narrow).toMatch(/\.plate-figure-img\s*\{[^}]*max-width:\s*240px/);
+  });
+});
