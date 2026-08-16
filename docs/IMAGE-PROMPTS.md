@@ -1141,3 +1141,137 @@ If the last plate looks empty, the fix is **layout** — negative space, the era
 ground showing through an empty frame, the plate furniture with nothing mounted
 in it — not a generated person. Flagged here as a design decision so that nobody
 later mistakes the blank for an unfinished prompt.
+
+---
+
+## 05 · CORRECTIONS OWED TO `src/data/lineage.ts`
+
+Bucketing all 28 nodes against real reference was supposed to produce prompt
+notes. It produced content errors as well. **This section is the list, written
+before any of it was changed**, so the diff that follows can be read against a
+statement of what was believed wrong and why.
+
+Severity is about the *page*, not the file: `main.ts` renders `name`, `age`,
+`branch`, `gained`, `stillWithYou` and `source`. It does **not** render `note`.
+An error corrected only in a `note` is not corrected — it is annotated.
+
+### A. Confirmed errors, rendered on the page
+
+**1 · Mammaliaformes (node 18) claims fur at ~225 Ma.**
+`gained` reads "jaw bones become ear bones; milk; fur". The earliest preserved
+mammaliaform fur is *Castorocauda* (~164 Ma, Ji et al. 2006) and *Megaconus*
+(~165 Ma, Zhou et al. 2013) — roughly **60 Myr later**. Fur at this node is an
+inference from much younger relatives, not a fact about this animal.
+
+**2 · The same node claims the jaw-to-ear transfer as complete.**
+At the *Morganucodon* grade the postdentary bones still sit in a trough on the
+dentary and the ancestral articular–quadrate joint is still present alongside
+the new dentary–squamosal one. The definitive mammalian middle ear — the
+postdentary bones fully detached — is later. "Become" should be "beginning to
+become".
+
+**3 · The same node's source does not support it.**
+It cites Wikipedia's *Adelobasileus* page. *Adelobasileus* is a partial skull
+with no postcrania that sits **outside** Mammaliaformes; it cannot anchor this
+node's traits.
+
+**4 · Placentalia (node 19) is not Placentalia.**
+160 Ma anchored on *Juramaia sinensis* is the **Eutheria/Metatheria** split —
+the paper's own title is "A Jurassic eutherian mammal and divergence of
+marsupials and placentals". Crown Placentalia is far younger: ~83–78 Ma
+(Álvarez-Carretero et al. 2022), ~102 Ma on the Zoonomia timescale (Foley et
+al. 2023), and 67.3 Ma in the fossil record. The node's own `note` already
+half-conceded this ("crown Placentalia's own radiation is younger, ~90–100 Ma")
+while the rendered name went on saying Placentalia.
+
+**5 · The same node's branch list merges two splits ~20–40 Myr apart.**
+`branch` is "platypus, echidna, marsupials". Monotremes leave at the
+monotreme/therian split, commonly placed ~166–200 Ma — not here, with the
+marsupials.
+
+**6 · The same node's `gained` is wrong twice.**
+"the placenta; live birth": marsupials have both, so neither distinguishes this
+branch from the cousins leaving at it — and *Eomaia*, the better-preserved close
+relative used for the reconstruction, still has **epipubic bones**, which imply a
+narrow birth canal and tiny, barely-developed newborns. Placental-grade
+reproduction is not what this node gained.
+
+**7 · Primates (node 21) cites the wrong paper, wrong journal, and wrong node.**
+The source reads "Alvarez-Carretero et al. 2022, Science … (80.7 Ma, 95% CI
+75.0–88.3 Ma)" against a science.org URL. That URL is **Foley et al. 2023,
+*Science*** (Zoonomia), and 80.7 Ma (75.0–88.3) is that paper's estimate for the
+origin of **Euarchontoglires** — not crown Primates. Álvarez-Carretero et al.
+2022 is in *Nature*, and puts crown Primates at 64.3–61.8 Ma.
+*The date and the branch are right for each other* — 80.7 Ma **is** the split
+where rodents and rabbits leave. It is the node's **name** and its traits that
+are wrong.
+
+**8 · The same node claims grasping hands and nails ~25 Myr early.**
+`gained` is "grasping hands; nails, not claws". The earliest evidence of
+arboreality in the group is *Purgatorius*' ankle bones at ~65 Ma; the earliest
+nail is on the opposable big toe of *Carpolestes simpsoni* at ~56 Ma, and on
+that digit only. Neither is available at 80.7 Ma.
+
+**9 · Simiiformes (node 23) is dated at 40 Ma, which is impossible.**
+Tarsiers leave at this node, so the split must predate the fossils on both
+sides of it: *Archicebus achilles* (tarsier side) is 55 Ma and *Eosimias*
+(anthropoid side) is 45 Ma. Springer et al. 2012 date Tarsiiformes/Anthropoidea
+at 58–50 Ma. 40 Ma is the age of crown Simiiformes — a *different*, younger
+split — so this is the same category of mistake the Boreoeutheria rename fixed
+in Phase 2: a correct number attached to the wrong node.
+
+**10 · Hominoidea (node 24) names the wrong cousins.**
+`branch` is "gibbons, orangutans" at 27 Ma. The group that leaves at the
+hominoid/cercopithecoid split — bracketed 29–24 Ma by *Saadanius* — is the
+**Old World monkeys**. Gibbons diverge ~19–15 Ma and orangutans later still, so
+the page has them leaving 8–12 Myr too early, and silently drops every monkey
+from the one node where monkeys actually leave. It also costs the node its best
+beat: the cousins who keep their tails leave exactly where your line loses its
+own.
+
+**11 · Homo (node 26) has no source in its `source` field.**
+It reads "standard paleoanthropological consensus" — which renders on the page
+under the heading **Source**. Every other node cites something checkable. This
+one asks the reader to take it on trust, in a piece whose entire argument is
+that the arithmetic is real.
+
+**12 · The same node credits *Homo* with tools it did not make and fire it did
+not control.** The Lomekwi 3 industry is 3.3 Ma — half a million years before
+this node — and is not attributed to *Homo*. Controlled fire's earliest secure
+evidence is ~1 Ma at Wonderwerk, with habitual use only from ~400 ka; attaching
+it here compresses nearly 2 Myr into one plate.
+
+### B. Confirmed, but the honest fix is wording, not data
+
+**13 · Tetrapoda (node 15): lungfish and coelacanths do not leave at 365 Ma.**
+The node's *own* cited source (PMC3338709) puts the lungfish–tetrapod split at
+~392 Ma, and the coelacanth line parts earlier still. But 365 Ma is the
+*Acanthostega* date, and that is the date the digits claim needs. The node is
+doing two jobs. The dataset already has an idiom for exactly this — the *Homo
+sapiens* node's "Neanderthals, Denisovans — already long separate by this point"
+— so this gets the same treatment rather than a redesign of the spine.
+
+### C. Audited and found sound — recorded so the next pass doesn't re-open them
+
+- **Amniota (16) / Synapsida (17).** Loose in clade terms: the split where
+  amphibians leave is crown Tetrapoda, and crown Amniota *is* the
+  synapsid/sauropsid split at 318 Ma. But each node's age matches the split it
+  names as leaving, so nothing rendered is false. Left alone deliberately.
+- **Haplorhini (22) at 70 Ma.** Sits at the old edge of Springer et al.'s 71–63
+  Ma for crown Primates, and well older than Álvarez-Carretero et al.'s
+  64.3–61.8 Ma. Defensible with its own citation; the disagreement is now on
+  record here.
+- **Vertebrata (11).** Its `note` already flags its own date as the
+  weakest-sourced figure in the set. Still true, still worth a better source,
+  not an error.
+- **Boreoeutheria (20), LUCA (1), first eukaryote (2), Holozoa (5).** Wide
+  ranges, honestly recorded as wide. Working as intended.
+- **Simiiformes' trichromacy removal and *Homo sapiens*' branch timing.** Both
+  Phase 2 corrections re-checked and still stand.
+
+### D. Not a science error, flagged and deliberately not fixed here
+
+`main.ts` renders `<strong>What changed in you:</strong> ${node.gained}`
+unconditionally, so the seven nodes with `gained: ""` render an empty claim.
+That is a rendering decision, not a data one, and fixing it belongs with the
+plate markup rather than in a science pass.
