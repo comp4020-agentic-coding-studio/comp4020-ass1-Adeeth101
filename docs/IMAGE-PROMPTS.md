@@ -83,11 +83,11 @@ side is still to build.
 | 16 | Amniota | 330 | **A‡** | *Hylonomus lyelli* | ~12 Myr |
 | 17 | Synapsida | 318 | **A‡** | *Archaeothyris florensis* | ~12 Myr |
 | 18 | Mammaliaformes | 225 | **A‡** | *Morganucodon* | ~20 Myr |
-| 19 | Placentalia | 160 | **A** | *Juramaia sinensis* (BMNH PM1343) | none |
+| 19 | Eutheria † | 160 | **A** | *Juramaia sinensis* (BMNH PM1343) | none |
 | 20 | Boreoeutheria | 93 | **B** | none — zero-fossil node | ≥27 Myr |
-| 21 | Primates | 80 | **A‡** | *Purgatorius*, *Carpolestes simpsoni* | ~14 / ~24 Myr |
+| 21 | Primate branch † | 80 | **A‡** | *Purgatorius*, *Carpolestes simpsoni* | ~14 / ~24 Myr |
 | 22 | Haplorhini | 70 | **A** | *Archicebus achilles* (IVPP V18618) | ~14–15 Myr |
-| 23 | Simiiformes | 40 | **A‡** | *Eosimias* — dentition only | node is younger |
+| 23 | Simiiformes | 55 † | **A‡** | *Eosimias* — dentition only | ~10 Myr |
 | 24 | Hominoidea | 27 | **A‡** | *Rukwapithecus* (jaw); *Ekembo* for body | ~2 / ~7–10 Myr |
 | 25 | Hominini | 7.5 | **A‡** | *Sahelanthropus* (TM 266-01-060-1) | ~0.3–0.8 Myr |
 | 26 | Homo | 2.8 | **A‡** | LD 350-1 — **mandible only** | none, but jaw only |
@@ -95,6 +95,9 @@ side is still to build.
 | 28 | You | 0 | **special** | — | see §04 |
 
 Counts: **B — 11**, **A — 7**, **A‡ — 9**, special — 1.
+
+**†** — name or date corrected in `src/data/lineage.ts` as a result of this
+research pass. The reasoning is in §05; the commits are separate from this file's.
 
 ---
 
@@ -442,7 +445,7 @@ No frame, no border, no matting.
 
 **Anchor:** *Morganucodon*, ~205 Ma. *Adelobasileus cromptoni* (225–220 Ma), the only candidate at the node date, is **a partial skull with no postcrania** and sits *outside* Mammaliaformes.
 **Gap:** ~20 Myr.
-**Watch — the fur claim.** Fur is **not** directly evidenced at 225 Ma. Earliest confirmed mammalian fur is *Castorocauda* (~164 Ma) and *Megaconus* (~165 Ma), roughly **60 Myr after this node**. A 2020 study also infers a metabolism well below modern mammals at this grade, weakening the insulation argument. See §05 — `src/data/lineage.ts` lists "fur" among this node's gains.
+**Watch — the fur claim.** Fur is **not** directly evidenced at 225 Ma. Earliest confirmed mammalian fur is *Castorocauda* (~164 Ma) and *Megaconus* (~165 Ma), roughly **60 Myr after this node**. A 2020 study also infers a metabolism well below modern mammals at this grade, weakening the insulation argument. `src/data/lineage.ts` used to list "fur" among this node's gains; **corrected** — see §05 items 1–3.
 
 ```
 Museum specimen illustration of an early mammaliaform, a small shrew-like
@@ -482,7 +485,7 @@ No frame, no border, no matting.
 
 **Anchor:** *Juramaia sinensis*, holotype BMNH PM1343, Liaoning, ~160 Ma. Proxy: *Eomaia scansoria*, ~125 Ma.
 **Gap:** none.
-**Watch — the node label is wrong at this date.** 160 Ma is the **Eutheria/Metatheria split**, the placental *stem*; crown Placentalia's fossil range is 67.3–0 Ma. `lineage.ts`'s own note already concedes the crown radiation is ~90–100 Ma. King & Beck (2020) also suggest *Juramaia* may be Early Cretaceous rather than Jurassic, and Sweetman et al. (2017) recover it outside Eutheria entirely.
+**Watch — the node label was wrong at this date, and is now fixed.** 160 Ma is the **Eutheria/Metatheria split**, the placental *stem*; crown Placentalia's fossil range is 67.3–0 Ma. `lineage.ts`'s own note already conceded the crown radiation is ~90–100 Ma while the rendered name went on saying Placentalia; the node is now named Eutheria — see §05 items 4–6. King & Beck (2020) also suggest *Juramaia* may be Early Cretaceous rather than Jurassic, and Sweetman et al. (2017) recover it outside Eutheria entirely.
 
 ```
 Museum specimen illustration of an early eutherian mammal weighing about 15
@@ -518,7 +521,7 @@ No frame, no border, no matting.
 
 **Anchor:** *Purgatorius* — teeth, jaw fragments and isolated ankle bones (astragali, calcanei), earliest Paleocene, ~65 Ma. Body plan from *Carpolestes simpsoni*, ~56 Ma, the oldest reasonably complete stem-primate skeleton.
 **Gap:** ~14 Myr to *Purgatorius*, ~24 Myr to *Carpolestes*.
-**Watch — this node's date is not a primate date.** The 80.7 Ma figure in `src/data/lineage.ts` is the origin of **Euarchontoglires** (Foley et al. 2023), the split where rodents and rabbits leave; crown Primates is ~64–62 Ma on comparable evidence. Everything a reader pictures at "the first primate" — forward-facing eyes, a nail on every finger — is 20–25 Myr younger than this plate. *Purgatorius* has no known skull and no known body: the ankle is the only postcranial evidence there is. See §05.
+**Watch — this node's date is not a primate date.** The 80.7 Ma figure in `src/data/lineage.ts` is the origin of **Euarchontoglires** (Foley et al. 2023), the split where rodents and rabbits leave; crown Primates is ~64–62 Ma on comparable evidence. Everything a reader pictures at "the first primate" — forward-facing eyes, a nail on every finger — is 20–25 Myr younger than this plate. *Purgatorius* has no known skull and no known body: the ankle is the only postcranial evidence there is. The node has been renamed from "The first primate" and its trait claim rewritten as a result — see §05 items 7–8.
 
 ```
 Museum specimen illustration of an early euarchontan mammal, a small
@@ -595,7 +598,7 @@ No frame, no border, no matting.
 
 **Anchor:** *Eosimias sinensis*, holotype IVPP V10591 — the right half of a lower jaw preserving P4–M2, Shanghuang fissure fills, Jiangsu, China, ~45 Ma. Eosimiid foot bones were later described from the same fills.
 **Gap:** ~10 Myr, once the node's date is corrected.
-**Watch — the node's stored date is impossible.** `src/data/lineage.ts` has this node at **40 Ma**, which would put the tarsier/anthropoid split *younger than its own fossils*: *Archicebus* (tarsier side) is 55 Ma and *Eosimias* (anthropoid side) is 45 Ma. Springer et al. 2012 put the split at 58–50 Ma. See §05. Beyond the date, this is a dentition-only anchor: everything but the teeth and a few foot bones is extrapolation.
+**Watch — the node's stored date was impossible, and is now fixed.** `src/data/lineage.ts` had this node at **40 Ma**, which put the tarsier/anthropoid split *younger than its own fossils*: *Archicebus* (tarsier side) is 55 Ma and *Eosimias* (anthropoid side) is 45 Ma. Now 55 Ma, per Springer et al. 2012's 58–50 Ma — see §05 item 9. Beyond the date, this is a dentition-only anchor: everything but the teeth and a few foot bones is extrapolation.
 
 ```
 Museum specimen illustration of an early simian primate weighing about 100
@@ -1275,3 +1278,31 @@ sapiens* node's "Neanderthals, Denisovans — already long separate by this poin
 unconditionally, so the seven nodes with `gained: ""` render an empty claim.
 That is a rendering decision, not a data one, and fixing it belongs with the
 plate markup rather than in a science pass.
+
+### E. What was actually done
+
+All thirteen items in A and B are fixed in `src/data/lineage.ts`, in four
+commits kept separate so each can be cited on its own:
+
+| Items | Commit subject |
+|---|---|
+| 1–6 | *Fix the two worst science errors: fur at 225 Ma, and Placentalia at 160 Ma* |
+| 7–10 | *Fix the primate half: a misattributed citation, an impossible date, wrong cousins* |
+| 11–13 | *Fix the two nodes whose cousins and credits arrive at the wrong time* |
+| — | *Harness rule: a date is not a node* |
+
+The fourth is the one that matters most. Items 7 and 9 are the **third and
+fourth** instances of a single failure mode — a correct number attached to the
+wrong node — after the Boreoeutheria rename in Phase 2. Per this repo's own
+"twice-wrong ⇒ fix the harness" rule, the response is not a third correction but
+a rule in `CLAUDE.md`, committed separately: check what the paper dates, what the
+node is, and which cousins the branch says leave there, **as three separate
+questions**, because in every one of these cases each looked fine on its own and
+only the disagreement between them carried the signal.
+
+The arithmetic half of that rule needs no expertise at all and would have caught
+item 9 on its own: **a divergence cannot be younger than the fossils on both
+sides of it.**
+
+Section C items are deliberately unchanged. Section D is a rendering issue and
+belongs with the plate markup, not here.
