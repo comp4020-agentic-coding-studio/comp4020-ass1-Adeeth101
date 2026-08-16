@@ -105,6 +105,45 @@ took equally long — false. Scroll proportional to real time compresses the
 best material (fins, ears, the vitamin-C gene) into under 1% of the page,
 and the marker's first ~55 seconds would be undifferentiated microbes.
 
+**Superseded 2026-08-16 — one mode, a tunable power law.** The original
+decision below is kept because the reasoning still holds and the rejected
+alternative is still rejected; what changed is that the "two modes" answer
+turned out to be unnecessary.
+
+Both modes were really the same function with a different exponent, so the
+exponent became the design instead of the toggle. Section spacing is now
+`gap ** PACING_EXPONENT`, normalized to a target total page length
+(`src/pacing.ts`). At an exponent of 1.0 this *is* true-scale mode; at 0
+it's uniform. Shipping value is 0.45.
+
+Two consequences worth recording:
+
+- **The toggle is gone, and with it the "distortion as content" argument.**
+  That was a real idea and it's a real loss. What replaced it is that the
+  distortion is now visible without interaction: the LUCA → eukaryote gap is
+  eleven screens and the last five nodes fit in four, so a reader feels the
+  disparity by scrolling rather than by being told about it via a control
+  they may never press.
+- **Plate size and gap size are now independent.** Spacing lives in a
+  dedicated `.node-spacer` element, not in the plate's own height, so
+  neither knob disturbs the other.
+
+**Rejected on the way (`f8619f8`, reverted in `aff066e`): log10.** Log
+flattened the disparity to about 5:1 between the largest and smallest gap,
+which reads as "these are roughly comparable" — the opposite of the point.
+The power law gives 43:1. Kept in history rather than deleted, since the
+gap between the two is the whole argument for the exponent.
+
+**Long empty stretches get sparse motion markers** — faint era/date marks
+every 100vh in any spacer past 200vh. Eleven screens of nothing is
+indistinguishable from a frozen page, and the marks are the cheapest
+possible proof of motion. They need no modern-end special case: those
+spacers never reach the threshold.
+
+---
+
+*Original Phase 1 decision, superseded above:*
+
 **Decision: two modes on the same data and the same state machine.**
 
 - **Learning mode (default, required).** Section height is a hand-set
