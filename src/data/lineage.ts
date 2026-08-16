@@ -71,6 +71,7 @@ export const LINEAGE: LineageNode[] = [
     gained: "",
     source:
       "Multigene molecular-clock studies placing this in the Mesoproterozoic — https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10883732/",
+    note: "`gained` is deliberately empty, and the heading is suppressed rather than filled (src/plate-format.ts, spec/plate-format.test.ts). No trait is defensibly attributable at this node: the idea that would have supplied one — the old \"unikont\" single-flagellum hypothesis — is no longer accepted, and the posterior-flagellum fact belongs to Opisthokonta one node down. The plate's content is the branch: plants and algae leave here. Do not fill this in without a primary source that dates a trait to this split, per \"A date is not a node\" in CLAUDE.md.",
   },
   {
     id: "opisthokonta",
@@ -93,7 +94,7 @@ export const LINEAGE: LineageNode[] = [
     gained: "",
     source:
       "PLOS Biology 2024 gives ~1.0 Ga (https://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.3002794); a fossil/HGT-calibrated Nature Ecology & Evolution 2025 estimate gives up to 1.77 Ga (https://www.nature.com/articles/s41559-025-02851-z)",
-    note: "A genuine method-dependent discrepancy of several hundred million years — kept as an honest wide range rather than smoothed into a fake-precise number.",
+    note: "A genuine method-dependent discrepancy of several hundred million years — kept as an honest wide range rather than smoothed into a fake-precise number. `gained` is deliberately empty, and the heading is suppressed rather than filled. The candidate trait — the cell-adhesion and signalling toolkit already present in single-celled holozoans before any animal exists — is real, but it is a genome fact rather than something the visitor can be shown carrying, and docs/DESIGN.md §7 kept this node for its branch: fungi leaving here is what makes \"a mushroom has been evolving for exactly as long as you have\" true. Do not fill it in just to balance the plate.",
   },
   {
     id: "metazoa",
@@ -275,7 +276,7 @@ export const LINEAGE: LineageNode[] = [
     gained: "",
     source:
       "ScienceDirect Boreoeutheria overview; PMC298725, placental mammal diversification",
-    note: "Renamed from the draft's \"Euarchontoglires\" — that name was for the wrong branch. This is the Boreoeutheria split (Euarchontoglires vs. Laurasiatheria); Laurasiatheria (dogs, whales, bats, horses) is a sister group, not a lineage branching off from within Euarchontoglires. See docs/DESIGN.md §7.",
+    note: "Renamed from the draft's \"Euarchontoglires\" — that name was for the wrong branch. This is the Boreoeutheria split (Euarchontoglires vs. Laurasiatheria); Laurasiatheria (dogs, whales, bats, horses) is a sister group, not a lineage branching off from within Euarchontoglires. See docs/DESIGN.md §7. `gained` is deliberately empty, and the heading is suppressed rather than filled. This is a zero-fossil molecular node — nothing at all is attributable to it (docs/IMAGE-PROMPTS.md §04, node 20) — and docs/DESIGN.md §7 kept it for its branch, which is the surprise that everything you picture when you hear \"animal\" leaves here. Do not fill it in.",
   },
   {
     id: "primates",
@@ -302,7 +303,7 @@ export const LINEAGE: LineageNode[] = [
       "you can't make your own vitamin C. The GULO gene broke around the time of this split, and you still carry the broken copy — lemurs and lorises, who leave here, still make their own",
     source:
       "Frontiers in Bioinformatics 2024 — https://www.frontiersin.org/journals/bioinformatics/articles/10.3389/fbinf.2024.1495417/full (71.3 Ma); GULO pseudogenization: Wikipedia \"L-gulonolactone oxidase\", citing Pollock & Mullin 1987, Am. J. Phys. Anthropol. 73(1):65-70",
-    note: "The single best \"receipt\" in the dataset. The GULO loss date is commonly cited as coincident with this split (~60–65 Ma) rather than pinned to one dedicated dating study.",
+    note: "The single best \"receipt\" in the dataset. The GULO loss date is commonly cited as coincident with this split (~60–65 Ma) rather than pinned to one dedicated dating study. `gained` is deliberately empty here too, and the heading is suppressed: the vitamin C line already does this plate's work, and a second trait beside it would dilute the best receipt in the set rather than strengthen it. A candidate fill exists — the fovea, the pit of dense cones giving you sharp central vision, which lemurs and lorises lack — but it was considered and declined, not overlooked.",
   },
   {
     id: "simiiformes",
@@ -311,10 +312,11 @@ export const LINEAGE: LineageNode[] = [
     ageRange: [50, 58],
     branch: "tarsiers",
     branchExamples: ["tarsiers"],
-    gained: "",
+    gained:
+      "nothing you can point to — the cousins who leave here already carried much of what you'd call yours",
     source:
       "Date: Springer et al. 2012, PLOS ONE, \"Macroevolutionary dynamics and historical biogeography of primate diversification inferred from a species supermatrix\" — https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0049521 (Tarsiiformes/Anthropoidea 58–50 Ma; crown Primates 71–63 Ma). Colour vision: Melin et al. 2013 — https://www.sciencedaily.com/releases/2013/03/130327132537.htm",
-    note: "Date corrected from 40 Ma in the science-accuracy audit (docs/IMAGE-PROMPTS.md §05, item 9). 40 Ma was impossible: tarsiers leave at this node, so the split has to predate the fossils on both sides of it — Archicebus achilles (tarsier side) is 55 Ma and Eosimias (anthropoid side) is 45 Ma. 40 Ma is the age of crown Simiiformes, a different and younger split, so this was a correct number attached to the wrong node. The original draft claimed \"gained three-colour vision\" here — that doesn't hold up. Tarsiers, who leave at this split, likely already carried much of the same colour-vision gene toolkit, so full trichromacy is older than (or arose after, at Catarrhini, which was cut per docs/DESIGN.md §7) this exact node. Reframed as a cousins-aren't-primitive moment rather than a trait-gain moment, which fits the page's point of view better anyway.",
+    note: "Date corrected from 40 Ma in the science-accuracy audit (docs/IMAGE-PROMPTS.md §05, item 9). 40 Ma was impossible: tarsiers leave at this node, so the split has to predate the fossils on both sides of it — Archicebus achilles (tarsier side) is 55 Ma and Eosimias (anthropoid side) is 45 Ma. 40 Ma is the age of crown Simiiformes, a different and younger split, so this was a correct number attached to the wrong node. The original draft claimed \"gained three-colour vision\" here — that doesn't hold up. Tarsiers, who leave at this split, likely already carried much of the same colour-vision gene toolkit, so full trichromacy is older than (or arose after, at Catarrhini, which was cut per docs/DESIGN.md §7) this exact node. Reframed as a cousins-aren't-primitive moment rather than a trait-gain moment, which fits the page's point of view better anyway. That reframing is now the rendered text: this is the one node where `gained` says there is nothing to point to, deliberately, rather than substituting a replacement trait. The page's whole argument lands at exactly the node where a trait claim failed checking, which is stronger than either filling the hole or leaving it blank. Do not replace this line with a trait.",
   },
   {
     id: "hominoidea",
@@ -337,10 +339,11 @@ export const LINEAGE: LineageNode[] = [
     ageRange: [7, 11],
     branch: "chimpanzees, bonobos",
     branchExamples: ["chimpanzees", "bonobos"],
-    gained: "",
+    gained:
+      "not two legs — not here. Whether the ~7-million-year-old candidates walked upright has been argued both ways since 2020, and the earliest indisputable evidence of walking on two legs is a trail of footprints ~3.66 million years old: about halfway from here to you",
     source:
-      "\"Parting ways: Pan-Homo divergence revisited\", Primates (2026) — https://link.springer.com/article/10.1007/s10329-026-01269-w",
-    note: "Contested — traditional estimates cluster 6–8 Ma; a fossil-reconciled reanalysis of the full TimeTree database pushes some estimates to ~10–11 Ma.",
+      "Date: \"Parting ways: Pan-Homo divergence revisited\", Primates (2026) — https://link.springer.com/article/10.1007/s10329-026-01269-w. Bipedalism: the ~3.66 Ma Laetoli footprints are the earliest indisputable evidence — Royal Society Proceedings B 2016 — https://royalsocietypublishing.org/rspb/article/283/1836/20160235/78167/Laetoli-footprints-reveal-bipedal-gait. Sahelanthropus at ~7 Ma is argued both ways and unresolved: Daver et al. 2022, Nature, argue for bipedalism; Macchiarelli et al. 2020 and Cazenave et al. 2024, Journal of Human Evolution, argue the postcranial evidence does not support it — https://hal.science/hal-04632880v1/file/Cazenave_&_al_2024_JHE_final.pdf; overview — https://www.mpg.de/22183908/what-about-bipedalism-in-sahelanthropus",
+    note: "Contested — traditional estimates cluster 6–8 Ma; a fossil-reconciled reanalysis of the full TimeTree database pushes some estimates to ~10–11 Ma. `gained` was empty and is now filled with the correction rather than the misconception. Upright walking is what every reader expects at the chimp split, and it is not established there: the Sahelanthropus femur has been read both ways since 2020 and the dispute is still live in 2024. Saying \"not yet, and here is when it is actually secure\" is the same move as the fur fix at Mammaliaformes, and it corrects a belief the visitor almost certainly arrives with.",
   },
   {
     id: "homo",
@@ -362,11 +365,12 @@ export const LINEAGE: LineageNode[] = [
     ageRange: [0.3, 0.35],
     branch: "Neanderthals, Denisovans — already long separate by this point",
     branchExamples: ["Neanderthals", "Denisovans"],
-    gained: "",
+    gained:
+      "a face already within the range of faces alive today — on a braincase still long and low. The skull that looks like you from the front does not yet look like you from the side",
     stillWithYou:
       "most non-African humans carry Neanderthal DNA today — not from a split, but from a re-meeting around 47,000 years ago",
     source:
-      "Jebel Irhoud fossil dating for H. sapiens origin; Neanderthal/Denisovan lineage split much earlier (~550–765 ka per multiple genomic studies); interbreeding timing per 2024 studies converging on ~47,000 years ago — https://www.nbcnews.com/science/science-news/neanderthals-ancient-humans-interbreeding-timeline-rcna183955",
+      "Face and braincase: Hublin et al. 2017, Nature, \"New fossils from Jebel Irhoud, Morocco and the pan-African origin of Homo sapiens\" — facial shape almost indistinguishable from living humans, braincase still elongated and archaic — https://www.mpg.de/11322481/oldest-homo-sapiens-fossils-at-jebel-irhoud-morocco; brain shape reaches present-day globularity only ~100,000–35,000 years ago, Neubauer, Hublin & Gunz 2018, Science Advances — https://www.science.org/doi/10.1126/sciadv.aao5961. Jebel Irhoud fossil dating for H. sapiens origin; Neanderthal/Denisovan lineage split much earlier (~550–765 ka per multiple genomic studies); interbreeding timing per 2024 studies converging on ~47,000 years ago — https://www.nbcnews.com/science/science-news/neanderthals-ancient-humans-interbreeding-timeline-rcna183955",
     note: "Corrected from the original draft: Neanderthals and Denisovans don't branch off \"here\" — they'd already been separate for roughly a quarter of a million years by the time anatomically modern humans looked like this. The honest and more interesting fact is the later interbreeding event, used here instead.",
   },
   {
