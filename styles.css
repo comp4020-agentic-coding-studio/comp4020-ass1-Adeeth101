@@ -13,7 +13,18 @@
   /* Ink */
   --text: #ece7dd;
   --text-2: #9a968c;
-  --text-3: #6b6862;
+
+  /* Raised from the spec's original #6b6862, which measured 3.14–3.27:1
+     against the era grounds — below WCAG AA at every scroll position, and
+     already below it against the old fixed --bg.
+     The binding constraint is --surface, not the grounds: an active plate is
+     lighter than any era colour, so .plate-cap-text on a lit plate is the
+     worst case at 4.61:1 (5.14:1 on the lightest ground). This is the lowest
+     value that clears AA there, chosen to keep as much tonal separation from
+     --text-2 as the requirement allows — that gap is now 11 rather than 47,
+     which is a real cost of the fix. Both cases asserted in
+     spec/era-palette.test.ts. */
+  --text-3: #8f8b83;
 
   /* Accent */
   --brass: #c6a15b;
@@ -396,10 +407,13 @@ nav[aria-label="Chapters"] {
   letter-spacing: 0.2em;
   text-transform: uppercase;
 
-  /* --text-2 at 90%, not --text-3: these sit on a moving background with no
-     plate behind them, and --text-3 lands at ~3.2:1 against every stop —
-     under WCAG AA. This pairing measures 5.06:1 at its worst point across
-     the whole age range, asserted in spec/era-palette.test.ts. */
+  /* --text-2 at 90%: these sit on a moving background with no plate behind
+     them, so they are checked against every era stop, not against --surface.
+     Measures 5.06:1 at its worst point across the whole age range, asserted
+     in spec/era-palette.test.ts. (Originally --text-3 at 80%, changed when
+     that token still failed AA; --text-3 has since been raised, but this
+     stays on --text-2 — these marks are the only text on bare ground for
+     screens at a time, and the extra margin is worth having there.) */
   color: var(--text-2);
   opacity: 0.9;
 }

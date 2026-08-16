@@ -45,7 +45,7 @@ read as considered rather than assembled.
 |---|---|---|
 | `--text` | `#ECE7DD` | Headings, emphasis. Warm off-white — never pure `#FFF`. |
 | `--text-2` | `#9A968C` | Body prose, secondary readouts. |
-| `--text-3` | `#6B6862` | Captions, dormant placards, metadata. |
+| `--text-3` | `#8F8B83` | Captions, dormant placards, metadata. **Amended 2026-08-16** — was `#6B6862`, which measured 3.14–3.27:1 against the era grounds (§02a) and failed WCAG AA everywhere, including against the original flat `--bg`. |
 
 ### Accent
 | Token | Hex | Used for |
@@ -326,8 +326,33 @@ identical — that vocabulary is what carries across breakpoints.
 
 ## 10 · ACCESSIBILITY
 
-- **Contrast.** `--text` on `--bg` is ~13:1. `--text-2` on `--bg` is ~6.2:1 — fine for body.
-  `--text-3` at ~3.4:1 is **only** for 11px+ uppercase placards, never for prose.
+- **Contrast.** Measured against every ground the page interpolates through *and* against
+  `--surface`, not against a single `--bg`. All three ink tokens clear WCAG AA (4.5:1) for
+  normal text everywhere:
+
+  | Token | On era grounds | On `--surface` |
+  |---|---|---|
+  | `--text` | 14.16 – 14.77 | 12.68 |
+  | `--text-2` | 5.91 – 6.16 | 5.29 |
+  | `--text-3` | 5.14 – 5.36 | **4.60** ← binding case |
+
+  `--surface` is lighter than any era ground, so an **active** plate is the worst case,
+  not the darkest wall. Asserted over a 421-point age sweep plus the surface case in
+  `spec/era-palette.test.ts`.
+
+  **Amended 2026-08-16:** this previously read "`--text-3` at ~3.4:1 is **only** for 11px+
+  uppercase placards, never for prose." That was the wrong remedy for a real problem.
+  3.4:1 fails AA for uppercase placards too — AA-large's 3:1 threshold needs 18.66px bold
+  or 24px regular, which an 11.5px placard is not — and the token was in any case being
+  used for `.plate-cap-text`, which is prose. The token was raised rather than the rule
+  narrowed. **Cost, recorded honestly:** the tonal gap between `--text-2` and `--text-3`
+  falls from 47 to 11 levels, so the three-step ink hierarchy is now carried mostly by
+  size, family and tracking rather than by value. That is the price of the fix, and it is
+  cheaper than shipping unreadable captions.
+
+- **Dormant plate content still fails.** `.plate-in` at `0.55` opacity puts body text at
+  **2.68:1** against the ground — worse than the token problem just fixed, and unchanged
+  by fixing it. The two options below are still open and still unresolved.
 - **Dormant plates.** Content at `0.55` opacity fails contrast. Either keep dormant plates fully
   available to screen readers, or raise dormant opacity to `0.7`. Do not ship `0.55` as a
   permanent state for content a reader may need to reach.
@@ -355,7 +380,7 @@ If a value isn't here, it isn't in the design.
   /* ink */
   --text:        #ECE7DD;
   --text-2:      #9A968C;
-  --text-3:      #6B6862;
+  --text-3:      #8F8B83;   /* amended — see §02 Ink */
 
   /* accent */
   --brass:       #C6A15B;

@@ -38,6 +38,12 @@ function token(name: string): [number, number, number] {
 
 const TEXT = token("text");
 const TEXT_2 = token("text-2");
+// --text-3 is in the sweep as of 2026-08-16. It used to be excluded because it
+// failed AA at every ground (3.14–3.27:1) and had failed against the original
+// flat --bg too, so the palette had not caused it. Excluding a known-failing
+// pair from the sensor is how it stays failing, so the token was raised
+// instead — and this is now the thing that stops it drifting back.
+const TEXT_3 = token("text-3");
 
 // Every age a reader can actually land on, sampled finely enough to catch a
 // bad interpolation between two individually-fine stops.
@@ -83,17 +89,26 @@ describe("backgroundRgbAt", () => {
 });
 
 describe("contrast is never allowed to drop below WCAG AA", () => {
-  it("holds AA for body text at every age in the sweep", () => {
+  it("holds AA for every ink token at every age in the sweep", () => {
     for (const age of SWEEP) {
       const bg = backgroundRgbAt(age);
-      expect(contrastRatio(TEXT, bg), `--text at ${Math.round(age)} Ma on ${bg}`).toBeGreaterThanOrEqual(
-        AA_NORMAL,
-      );
-      expect(
-        contrastRatio(TEXT_2, bg),
-        `--text-2 at ${Math.round(age)} Ma on ${bg}`,
-      ).toBeGreaterThanOrEqual(AA_NORMAL);
+      for (const [name, ink] of [
+        ["--text", TEXT],
+        ["--text-2", TEXT_2],
+        ["--text-3", TEXT_3],
+      ] as const) {
+        expect(
+          contrastRatio(ink, bg),
+          `${name} at ${Math.round(age)} Ma on rgb(${bg.join(" ")})`,
+        ).toBeGreaterThanOrEqual(AA_NORMAL);
+      }
     }
+  });
+
+  it("holds AA for --text-3 on the raised plate surface too", () => {
+    // .plate-cap-text is --text-3 and sits on --surface when its plate is
+    // active, so the ground sweep alone doesn't cover where it actually reads.
+    expect(contrastRatio(TEXT_3, token("surface"))).toBeGreaterThanOrEqual(AA_NORMAL);
   });
 
   it("holds AA for the spacer marks, which are drawn at 90% opacity", () => {
