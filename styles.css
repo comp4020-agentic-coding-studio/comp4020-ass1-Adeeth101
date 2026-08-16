@@ -291,29 +291,67 @@ nav[aria-label="Chapters"] {
 
 /* ---- Lineage layout ---- */
 
+/* --page-pad and --gutter are read by .trunk as well as by the rows, so the
+   page-level trunk lands on exactly the same x as each row's junction dot at
+   both breakpoints. Changing either value moves both together; that coupling
+   is the point. */
 #lineage {
-  padding: var(--s7) 18px var(--s9);
+  --page-pad: 18px;
+  --gutter: 40px;
+
+  position: relative;
+  padding: var(--s7) var(--page-pad) var(--s9);
 }
 
 @media (width >= 720px) {
   #lineage {
-    padding-inline: 32px;
+    --page-pad: 32px;
+    --gutter: var(--s8);
   }
 }
 
-.node-row {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* One trunk for the whole lineage (spec §07), behind every row. Mirrors the
+   rows' own centring so it tracks the content column, and stops at the
+   padding edges so it begins at LUCA and ends at you rather than dangling
+   into the header and footer. */
+.trunk {
+  position: absolute;
+  inset: var(--s7) var(--page-pad) var(--s9);
   max-width: calc(940px + var(--s7) + var(--s8));
   margin-inline: auto;
-  gap: var(--s5);
+  pointer-events: none;
+}
+
+.trunk svg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+
+  /* 25% of the gutter — the same fraction as cx=24 in each row's 96-unit
+     diagram viewBox, which is what keeps the junction dots on the line. */
+  left: calc(var(--gutter) * 0.25);
+  width: 4px;
+  height: 100%;
+  margin-left: -2px;
+  display: block;
+}
+
+/* One layout at both breakpoints now: gutter on the left, plate on the
+   right. The old narrow-screen variant stacked the diagram *below* the plate
+   as a horizontal connector, which a continuous vertical trunk can't use. */
+.node-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: stretch;
+  max-width: calc(940px + var(--s7) + var(--s8));
+  margin-inline: auto;
+  gap: var(--s2);
 }
 
 @media (width >= 720px) {
   .node-row {
-    flex-direction: row-reverse;
-    align-items: stretch;
     gap: var(--s7);
   }
 }
@@ -355,15 +393,7 @@ nav[aria-label="Chapters"] {
 
 .node-diagram {
   flex-shrink: 0;
-  width: 100%;
-  height: 64px;
-}
-
-@media (width >= 720px) {
-  .node-diagram {
-    width: 96px;
-    height: auto;
-  }
+  width: var(--gutter);
 }
 
 .node-diagram svg {

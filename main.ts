@@ -53,24 +53,50 @@ const SPACER_HEIGHTS_VH = spacerHeightsVh(AGES);
 // rather than guessed, per this repo's science-accuracy rule.
 const TERMINATED_BRANCHES = new Set<string>(["homo-sapiens"]);
 
-// Branch-line diagram (spec §07): a filled tapered trunk plus the
-// termination / survivor / your-junction dot vocabulary. Kept deliberately
-// text-free — the 96px gutter is too narrow for legible labels at the
-// type scale in §03, so the meaning is carried by the aria-label instead.
+// The trunk (spec §07) is ONE element for the whole page, not one per node.
+// Per-row trunks stopped at every plate and restarted at the next, which
+// left the line absent across each spacer — eleven screens of nothing in
+// LUCA's case, on a page called "One Unbroken Line". Drawing it once behind
+// everything also lets the spec's 3px → 1.5px taper run the full lineage
+// instead of resetting 28 times.
+//
+// Still a filled path rather than a stroke, per §07. viewBox units are 1:1
+// with px horizontally (4 units across a 4px-wide box) so the taper lands on
+// the spec's exact widths; preserveAspectRatio="none" stretches only y.
+function trunkElement(): HTMLElement {
+  const trunk = document.createElement("div");
+  trunk.className = "trunk";
+  trunk.setAttribute("aria-hidden", "true");
+  trunk.innerHTML =
+    '<svg viewBox="0 0 4 100" preserveAspectRatio="none">' +
+    '<path d="M0.6 0 L3.4 0 L2.75 100 L1.25 100 Z" fill="var(--brass)" fill-opacity="0.62" />' +
+    "</svg>";
+  return trunk;
+}
+
+// Per-node branch marks (spec §07): the junction dot and, where a cousin
+// lineage leaves, the drooping curve and its termination / survivor dot. The
+// trunk itself is no longer drawn here — these sit ON the page-level trunk,
+// which is why the junction stays at x=24 of a 96-unit viewBox: that is 25%
+// of the gutter, and .trunk is positioned at the same 25%.
+//
+// Kept deliberately text-free — the gutter is too narrow for legible labels
+// at the type scale in §03, so the meaning is carried by the aria-label.
 function branchSvgMarkup(node: LineageNode): string {
-  const trunk =
-    '<path d="M22.5 0 L25.5 0 L24.75 240 L23.25 240 Z" fill="var(--brass)" fill-opacity="0.62" />';
   const junction = '<circle cx="24" cy="120" r="4" fill="var(--brass)" />';
   if (node.branch.trim() === "") {
-    return `${trunk}${junction}`;
+    return junction;
   }
+  // Non-scaling strokes: the viewBox is stretched hard on the vertical axis
+  // (and harder still on a narrow gutter), which would otherwise smear a
+  // 1px stroke into an ellipse-weighted line.
   const curve =
-    '<path d="M24 90 Q58 96 78 60" fill="none" stroke="var(--brass)" stroke-opacity="0.4" stroke-width="1" />';
+    '<path d="M24 90 Q58 96 78 60" fill="none" stroke="var(--brass)" stroke-opacity="0.4" stroke-width="1" vector-effect="non-scaling-stroke" />';
   const dot = TERMINATED_BRANCHES.has(node.id)
-    ? '<circle cx="78" cy="60" r="2.8" fill="none" stroke="var(--rust)" stroke-width="1" />' +
-      '<line x1="76.1" y1="58.1" x2="79.9" y2="61.9" stroke="var(--rust)" stroke-width="1" />'
+    ? '<circle cx="78" cy="60" r="2.8" fill="none" stroke="var(--rust)" stroke-width="1" vector-effect="non-scaling-stroke" />' +
+      '<line x1="76.1" y1="58.1" x2="79.9" y2="61.9" stroke="var(--rust)" stroke-width="1" vector-effect="non-scaling-stroke" />'
     : '<circle cx="78" cy="60" r="2.8" fill="var(--cool)" fill-opacity="0.7" />';
-  return `${trunk}${curve}${dot}${junction}`;
+  return `${curve}${dot}${junction}`;
 }
 
 function branchSvgLabel(node: LineageNode): string {
@@ -109,6 +135,9 @@ function spacerAfter(index: number): HTMLElement | null {
   }
   return spacer;
 }
+
+// First child, so it paints behind every row that follows it in DOM order.
+lineageEl.append(trunkElement());
 
 const plates: HTMLElement[] = [];
 const rows: HTMLElement[] = [];

@@ -202,9 +202,39 @@ Plate VII of XVI · Carboniferous          320 million years before present
 1.5px at the bottom, so it reads as a nib line on plate paper rather than a CSS border.
 Branches leave as slack quadratic curves with a slight droop, as though under their own weight.
 
+### The trunk is one element for the whole page — amended 2026-08-16
+
+The reference SVG below draws trunk and branches together, and the first implementation followed
+it literally: one SVG per node, each containing its own slice of trunk. That was wrong once
+time-scaled pacing (`docs/DESIGN.md` §4) put real distance between plates. A per-node trunk stops
+at the bottom of each plate and restarts at the top of the next, so across LUCA's spacer — eleven
+screens at the current tuning — there was no line on the page at all. On a piece called *One
+Unbroken Line*, that is a correctness bug, not a cosmetic one.
+
+**Current model:**
+
+- **The trunk** is a single element, `.trunk`, absolutely positioned behind the whole lineage and
+  spanning its full height, spacers included. Still a filled, tapering path — the taper now runs
+  once across the entire lineage instead of resetting at every node, which is closer to what the
+  taper was always trying to say.
+- **Per-node SVGs** draw only what belongs to that node: the junction dot, and where a cousin
+  lineage leaves, the curve and its termination or survivor dot. No trunk.
+- **Alignment** is held by a shared `--gutter` custom property. The trunk sits at 25% of the
+  gutter; each node's junction is at `cx="24"` in a 96-unit viewBox, the same 25%. Both read the
+  same variable, so the two cannot drift apart at either breakpoint. Verified rendered, not
+  assumed: trunk centre and junction centres all land on the same x.
+- **Narrow screens** use the same layout as desktop with a smaller gutter (40px vs 96px). The
+  previous narrow-screen variant put the diagram *below* the plate as a horizontal connector,
+  which a continuous vertical trunk cannot use. Branch curves carry
+  `vector-effect="non-scaling-stroke"` so the hard vertical stretch of the viewBox doesn't smear
+  a 1px stroke.
+
+The reference SVG below is kept as the **visual** reference for weights, colours and the dot
+vocabulary — all of which still hold exactly. It is no longer the structural reference.
+
 | Element | Spec |
 |---|---|
-| Trunk | Filled `<path>`, not a stroke. Tapers 3px → 1.5px top to bottom. `--brass` at 62%. |
+| Trunk | Filled `<path>`, not a stroke. Tapers 3px → 1.5px **across the whole page**, drawn once. `--brass` at 62%. |
 | Branch | Quadratic curve with a slight droop. 1px stroke, `--brass` at 40%. |
 | Terminated lineage | Hollow 2.8r dot, `--rust` 1px stroke, with a 45° tick struck through it. |
 | Surviving, not yours | Solid 2.8r dot in `--cool` at 70%. |
