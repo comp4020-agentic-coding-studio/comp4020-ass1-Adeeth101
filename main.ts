@@ -10,6 +10,7 @@
 
 import { LINEAGE, type LineageNode } from "./src/data/lineage";
 import { createLineage } from "./src/lineage-state";
+import { backgroundCssAt } from "./src/era-palette";
 import { markersFor, spacerHeightsVh } from "./src/pacing";
 import { eraFor, formatAge, romanNumeral } from "./src/plate-format";
 
@@ -314,6 +315,8 @@ function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
+let lastBackground = "";
+
 function updateGauge(): void {
   const doc = document.documentElement;
   const maxScroll = doc.scrollHeight - window.innerHeight;
@@ -331,6 +334,17 @@ function updateGauge(): void {
 
   gaugeEraEl.textContent = eraFor(age);
   gaugeDateEl.textContent = age > 0 ? `${formatAge(age)} before present` : "Now";
+
+  // The ground colour rides the same interpolated age as the date readout,
+  // which is what makes it continuous across a spacer rather than stepping
+  // at each plate. Written only when it actually changes — this runs on
+  // every scroll event, and setting an identical custom property still costs
+  // a style recalculation.
+  const background = backgroundCssAt(age);
+  if (background !== lastBackground) {
+    lastBackground = background;
+    document.documentElement.style.setProperty("--bg-now", background);
+  }
 }
 window.addEventListener("scroll", updateGauge, { passive: true });
 updateGauge();

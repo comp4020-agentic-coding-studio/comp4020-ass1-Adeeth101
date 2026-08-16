@@ -97,10 +97,17 @@ html {
   }
 }
 
+/* --bg-now is written by main.ts from the interpolated age under the reader
+   (src/era-palette.ts), so the ground is a continuous deep-time readout
+   rather than a fixed colour. --bg remains the fallback and the value every
+   stop is calibrated against, so the page is correct before the first scroll
+   event and if scripting never runs. Deliberately no transition: like the
+   depth gauge fill (§06), a transition would lag the scroll and read as
+   broken. */
 body {
   margin: 0;
   overflow-x: hidden;
-  background: var(--bg);
+  background: var(--bg-now, var(--bg));
   color: var(--text-2);
   font-family: var(--serif);
   line-height: 1.68;
@@ -227,7 +234,10 @@ nav[aria-label="Chapters"] {
   top: 0;
   z-index: 10;
   padding: var(--s3) 18px;
-  background: var(--bg);
+
+  /* Must track the ground: the gauge is sticky, so a fixed colour here would
+     sit as a visible bar of stale background over the live one. */
+  background: var(--bg-now, var(--bg));
   border-bottom: 1px solid var(--rule);
 }
 
@@ -385,8 +395,13 @@ nav[aria-label="Chapters"] {
   font-size: 11.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--text-3);
-  opacity: 0.8;
+
+  /* --text-2 at 90%, not --text-3: these sit on a moving background with no
+     plate behind them, and --text-3 lands at ~3.2:1 against every stop —
+     under WCAG AA. This pairing measures 5.06:1 at its worst point across
+     the whole age range, asserted in spec/era-palette.test.ts. */
+  color: var(--text-2);
+  opacity: 0.9;
 }
 
 /* ---- Branch-line diagram (spec §07) ---- */
