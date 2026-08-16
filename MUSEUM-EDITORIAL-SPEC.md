@@ -167,6 +167,44 @@ identity-carrying detail in the system; do not replace it with a border-radius c
 | Transform | none | **none** | — |
 | Box-shadow | none | **none** | — |
 
+### The image slot — added 2026-08-16
+
+The anatomy above had nowhere for the generated stills to go. It does now:
+
+```
+.plate__in            display grid
+  .plate__text        everything above — num, title, sub, body, cap
+  .plate__figure      the print: <img> + <figcaption> tag
+```
+
+**Desktop (≥720px):** two columns, `minmax(0, 1fr)` for the text and a fixed
+`200px` for the print, `column-gap: --s6`. The print sits on the **right**, away
+from the branch-line gutter on the left.
+**Phone:** one column, print after the placard, capped at `240px`.
+
+Three rules that are load-bearing rather than cosmetic:
+
+- **The second column only exists when there is an image.** The template is on
+  `.plate__in:has(.plate__figure)`, so a node with no asset is a single column
+  exactly as before — no reserved column, no hole. Media is landing after the
+  page was built and must never leave a gap in the meantime.
+- **The print carries its own backdrop, and isolates.** Stills ship with a pure
+  `#000000` backdrop cancelled by `mix-blend-mode: screen`
+  (`docs/IMAGE-STYLE.md` §01). Screen blends with the backdrop *within the
+  nearest isolating ancestor* — and `.plate__in` carries `opacity: 0.55` when
+  dormant, which creates a stacking context and would isolate the image against
+  nothing, i.e. a visible black square. So the figure paints
+  `var(--bg-now, var(--bg))` itself, switches to `--surface` under `.plate-on`,
+  and sets `isolation: isolate` to make the blending group explicit. The
+  backdrop therefore always matches whatever surrounds it, in both states.
+- **The tag is outside the blend.** `mix-blend-mode: normal` on the figcaption —
+  screening the label against the ground washes it out.
+
+Per-image tag text comes from the evidence bucket
+(`src/data/image-buckets.ts`), doing double duty as the AI-generation label
+required by `docs/IMAGE-STYLE.md` §07. No bucket, no image: an unlabelled AI
+reconstruction is worse than a plate with no illustration.
+
 ### Activation trigger
 Scroll-driven. Use an `IntersectionObserver` with `rootMargin: "-42% 0px -42% 0px"` so a plate
 activates as it crosses the middle band of the viewport. **Exactly one plate is active at a

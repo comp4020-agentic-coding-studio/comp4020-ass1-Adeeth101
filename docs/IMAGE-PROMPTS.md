@@ -55,9 +55,14 @@ for, so it does not license colour there either.
 Per `docs/IMAGE-STYLE.md` §01, subjects composite with `mix-blend-mode: screen`, under
 which pure black vanishes. Screen is not keying: it lifts dark tones toward
 transparency **inside the subject too**. Reject any generation that sits low in value,
-however good it looks alone. Nothing in the page consumes these yet — there is no
-`<img>` in the plate markup and no `mix-blend-mode` rule in `styles.css`, so the CSS
-side is still to build.
+however good it looks alone.
+
+**The page now consumes these** (built 2026-08-16, `MUSEUM-EDITORIAL-SPEC.md` §05
+amendment). Drop a file at `images/plates/<node id>.webp` and that node's plate grows
+an image slot with no code change; a node with no file renders no slot at all. The tag
+under each image is generated from the bucket in the table below, via
+`src/data/image-buckets.ts` — so **the bucket assignments above are now code**, and
+getting one wrong is a failing test rather than a mislabelled picture.
 
 ---
 
@@ -94,7 +99,12 @@ side is still to build.
 | 27 | *Homo sapiens* | 0.3 | **A** | Jebel Irhoud 1, 2, 10, 11 | none |
 | 28 | You | 0 | **special** | — | see §04 |
 
-Counts: **B — 11**, **A — 7**, **A‡ — 9**, special — 1.
+Counts: **B — 10**, **A — 8**, **A‡ — 9**, special — 1.
+
+Corrected 2026-08-16: this line read "B — 11, A — 7" and neither figure matched
+the table above it. Caught by `spec/plate-image.test.ts`, which asserts these
+counts against `src/data/image-buckets.ts` — the bucket assignments are now
+code, so a miscount is a failing test rather than a number nobody re-adds.
 
 **†** — name or date corrected in `src/data/lineage.ts` as a result of this
 research pass. The reasoning is in §05; the commits are separate from this file's.
@@ -784,7 +794,7 @@ No frame, no border, no matting.
 
 ## 04 · BUCKET B PROMPTS — inferred, no fossil constrains the appearance
 
-Eleven nodes, plus the one node that gets no image at all.
+Ten nodes, plus the one node that gets no image at all.
 
 These are **honest visual hypotheses**, and the page must not imply otherwise
 (`docs/IMAGE-STYLE.md` §04, and the per-image tag recommended in §07 is what
