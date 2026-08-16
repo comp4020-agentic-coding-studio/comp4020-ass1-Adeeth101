@@ -15,25 +15,32 @@ import { plateImage } from "../src/plate-image";
 
 const TETRAPODA = { id: "tetrapoda", name: "The first tetrapod" };
 
+// One generated still, both width variants, as main.ts assembles them.
+const STILL = [
+  { url: "/x-512.webp", width: 512, format: "webp" },
+  { url: "/x-1024.webp", width: 1024, format: "webp" },
+];
+const ONE = [STILL[0]];
+
 describe("plateImage", () => {
   it("renders nothing at all when the asset does not exist yet", () => {
-    expect(plateImage(TETRAPODA, 3, undefined)).toBeNull();
+    expect(plateImage(TETRAPODA, 3, [])).toBeNull();
   });
 
   it("renders nothing rather than an unlabelled AI image when the bucket is unknown", () => {
-    expect(plateImage({ id: "not-a-node", name: "Nothing" }, 3, "/x.webp")).toBeNull();
+    expect(plateImage({ id: "not-a-node", name: "Nothing" }, 3, STILL)).toBeNull();
   });
 
   it("names the node and declares the image AI-generated in the alt text", () => {
-    const image = plateImage(TETRAPODA, 3, "/x.webp");
+    const image = plateImage(TETRAPODA, 3, STILL);
     expect(image?.alt).toContain("The first tetrapod");
     expect(image?.alt).toMatch(/AI-generated/i);
   });
 
   it("carries the evidence bucket in the visible tag, three ways", () => {
-    const a = plateImage({ id: "tetrapoda", name: "n" }, 1, "/x.webp");
-    const partial = plateImage({ id: "mammaliaformes", name: "n" }, 1, "/x.webp");
-    const b = plateImage({ id: "luca", name: "n" }, 1, "/x.webp");
+    const a = plateImage({ id: "tetrapoda", name: "n" }, 1, STILL);
+    const partial = plateImage({ id: "mammaliaformes", name: "n" }, 1, STILL);
+    const b = plateImage({ id: "luca", name: "n" }, 1, STILL);
 
     expect(new Set([a?.tag, partial?.tag, b?.tag]).size).toBe(3);
     expect(a?.tag).toMatch(/from fossil material/i);
@@ -42,14 +49,59 @@ describe("plateImage", () => {
   });
 
   it("says in the alt text, not only the visible tag, how much fossil evidence there is", () => {
-    expect(plateImage({ id: "luca", name: "LUCA" }, 1, "/x.webp")?.alt).toMatch(/no fossil/i);
+    expect(plateImage({ id: "luca", name: "LUCA" }, 1, STILL)?.alt).toMatch(/no fossil/i);
   });
 
   it("loads the first plate eagerly and every other plate lazily", () => {
-    expect(plateImage(TETRAPODA, 0, "/x.webp")?.loading).toBe("eager");
+    expect(plateImage(TETRAPODA, 0, STILL)?.loading).toBe("eager");
     for (const index of [1, 2, 14, 27]) {
-      expect(plateImage(TETRAPODA, index, "/x.webp")?.loading).toBe("lazy");
+      expect(plateImage(TETRAPODA, index, STILL)?.loading).toBe("lazy");
     }
+  });
+});
+
+// A 1:1 still is displayed at 200–240 CSS px and nowhere near its full size, so
+// serving one width would mean shipping roughly four times the bytes a phone
+// needs. These are the contracts that make the second variant actually work:
+// without `sizes` the browser assumes the image is the full viewport width and
+// picks the largest file every time, which is worse than not offering a choice.
+describe("plateImage width variants", () => {
+  it("offers every variant to the browser with its real pixel width", () => {
+    const image = plateImage(TETRAPODA, 1, STILL);
+    expect(image?.srcset).toBe("/x-512.webp 512w, /x-1024.webp 1024w");
+  });
+
+  it("falls back to the smallest variant in src, not the largest", () => {
+    // src is what a browser ignoring srcset fetches. Defaulting to the 1024
+    // would punish exactly the weak client the fallback exists for.
+    expect(plateImage(TETRAPODA, 1, STILL)?.src).toBe("/x-512.webp");
+  });
+
+  it("sorts variants by width regardless of the order the assets were found in", () => {
+    const image = plateImage(TETRAPODA, 1, [STILL[1], STILL[0]]);
+    expect(image?.srcset).toBe("/x-512.webp 512w, /x-1024.webp 1024w");
+    expect(image?.src).toBe("/x-512.webp");
+  });
+
+  it("offers no srcset at all when there is only one variant", () => {
+    const image = plateImage(TETRAPODA, 1, ONE);
+    expect(image?.srcset).toBeNull();
+    expect(image?.sizes).toBeNull();
+    expect(image?.src).toBe("/x-512.webp");
+  });
+
+  it("declares a display width that matches what the stylesheet actually does", () => {
+    // Pinned against the real stylesheet: a `sizes` that drifts from the CSS is
+    // silent — the page looks right and every phone downloads the wrong file.
+    const css = readFileSync(resolve(import.meta.dirname, "../styles.css"), "utf8");
+    const column = css.match(/grid-template-columns:\s*minmax\(0, 1fr\) (\d+px)/)?.[1];
+    const cap = css.match(/\.plate-figure-img\s*\{[^}]*max-width:\s*(\d+px)/)?.[1];
+
+    expect(column, "the desktop image column width moved").toBeDefined();
+    expect(cap, "the narrow-viewport width cap moved").toBeDefined();
+    expect(plateImage(TETRAPODA, 1, STILL)?.sizes).toBe(
+      `(width >= 720px) ${column}, ${cap}`,
+    );
   });
 });
 

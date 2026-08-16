@@ -19,8 +19,20 @@
 
 import { IMAGE_BUCKETS, type ImageBucket } from "./data/image-buckets";
 
+// One file on disk. main.ts finds these by globbing images/plates and reading
+// the width off the filename, so adding a third variant is a file drop.
+export interface PlateImageSource {
+  url: string;
+  width: number;
+  format: string;
+}
+
 export interface PlateImage {
   src: string;
+  // null when there is only one variant: a srcset that offers no choice is
+  // noise, and `sizes` without a srcset does nothing at all.
+  srcset: string | null;
+  sizes: string | null;
   alt: string;
   // The per-image tag from docs/IMAGE-STYLE.md §07, doing double duty as the
   // bucket distinction — "reconstruction from fossil material" versus
@@ -29,6 +41,13 @@ export interface PlateImage {
   tag: string;
   loading: "eager" | "lazy";
 }
+
+// What the stylesheet actually gives the figure: a 200px column above the
+// breakpoint, capped at 240px below it. Without this the browser assumes every
+// image is viewport-width and always takes the largest file, which would make
+// the second variant worse than useless. spec/plate-image.test.ts pins these
+// two numbers against styles.css so they cannot drift apart in silence.
+const DISPLAY_SIZES = "(width >= 720px) 200px, 240px";
 
 const EVIDENCE: Record<ImageBucket, { alt: string; tag: string }> = {
   A: {
@@ -48,16 +67,25 @@ const EVIDENCE: Record<ImageBucket, { alt: string; tag: string }> = {
 export function plateImage(
   node: { id: string; name: string },
   index: number,
-  src: string | undefined,
+  sources: readonly PlateImageSource[],
 ): PlateImage | null {
-  if (src === undefined) return null;
+  if (sources.length === 0) return null;
 
   const bucket = IMAGE_BUCKETS[node.id] as ImageBucket | undefined;
   if (bucket === undefined) return null;
 
+  // Sorted here rather than trusted from the caller: the glob returns files in
+  // whatever order the filesystem hands over, and src has to be the smallest.
+  const variants = [...sources].sort((a, b) => a.width - b.width);
   const evidence = EVIDENCE[bucket];
+
   return {
-    src,
+    src: variants[0].url,
+    srcset:
+      variants.length > 1
+        ? variants.map((variant) => `${variant.url} ${variant.width}w`).join(", ")
+        : null,
+    sizes: variants.length > 1 ? DISPLAY_SIZES : null,
     alt: `${node.name} — AI-generated reconstruction, ${evidence.alt}.`,
     tag: evidence.tag,
     // Only the first plate is in the viewport at load. Nothing is preloaded:

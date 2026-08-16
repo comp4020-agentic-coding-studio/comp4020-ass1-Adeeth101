@@ -13,13 +13,14 @@ import { createLineage } from "./src/lineage-state";
 import { backgroundCssAt } from "./src/era-palette";
 import { markersFor, spacerHeightsVh } from "./src/pacing";
 import { eraFor, formatAge, plateFacts, romanNumeral } from "./src/plate-format";
-import { plateImage } from "./src/plate-image";
+import { plateImage, type PlateImageSource } from "./src/plate-image";
 
 // Assets are discovered by filename, not listed in code: images/plates/<node
-// id>.<ext>. Dropping tetrapoda.webp into that folder wires up the Tetrapoda
-// plate with no edit here, and a node with no file renders no image slot at
-// all. That is the point — media is landing after the page was built, and
-// CLAUDE.md is explicit that late media must never block the build.
+// id>-<width>.<ext>, or <node id>.<ext> for a single-variant file. Dropping
+// tetrapoda-512.webp and tetrapoda-1024.webp into that folder wires up the
+// Tetrapoda plate with no edit here, and a node with no file renders no image
+// slot at all. That is the point — media is landing after the page was built,
+// and CLAUDE.md is explicit that late media must never block the build.
 //
 // Bundled through Vite rather than referenced as a bare path, so every URL is
 // hashed and rewritten relative to the deploy base. A root-absolute path would
@@ -32,12 +33,21 @@ const PLATE_ASSET_MODULES = import.meta.glob<string>("./images/plates/*.{webp,pn
   import: "default",
 });
 
-const PLATE_ASSETS = new Map<string, string>(
-  Object.entries(PLATE_ASSET_MODULES).map(([path, url]) => [
-    path.slice(path.lastIndexOf("/") + 1, path.lastIndexOf(".")),
-    url,
-  ]),
-);
+const PLATE_ASSETS = new Map<string, PlateImageSource[]>();
+for (const [path, url] of Object.entries(PLATE_ASSET_MODULES)) {
+  const dot = path.lastIndexOf(".");
+  const stem = path.slice(path.lastIndexOf("/") + 1, dot);
+
+  // Matched off the end so node ids containing a hyphen survive: "homo-sapiens-1024"
+  // is homo-sapiens at 1024, and a bare "homo-sapiens" is one variant of unknown
+  // width. Only a trailing "-<digits>" is ever read as a width.
+  const suffix = /-(\d+)$/.exec(stem);
+  const id = suffix === null ? stem : stem.slice(0, -suffix[0].length);
+
+  const sources = PLATE_ASSETS.get(id) ?? [];
+  sources.push({ url, width: suffix === null ? 0 : Number(suffix[1]), format: path.slice(dot + 1) });
+  PLATE_ASSETS.set(id, sources);
+}
 
 function required<T>(value: T | null, selector: string): T {
   if (value === null) {
@@ -222,11 +232,13 @@ for (const [index, node] of LINEAGE.entries()) {
   // placed to its right by grid on desktop rather than by reordering. When
   // there is no asset, nothing is appended and .plate-in never gets the
   // two-column template — the plate closes up instead of leaving a hole.
-  const image = plateImage(node, index, PLATE_ASSETS.get(node.id));
+  const image = plateImage(node, index, PLATE_ASSETS.get(node.id) ?? []);
   if (image !== null) {
     const img = document.createElement("img");
     img.className = "plate-figure-img";
     img.src = image.src;
+    if (image.srcset !== null) img.srcset = image.srcset;
+    if (image.sizes !== null) img.sizes = image.sizes;
     img.alt = image.alt;
     img.loading = image.loading;
     img.decoding = "async";
