@@ -17,10 +17,35 @@ Museum specimen illustration of [SUBJECT]. Scientific reconstruction,
 anatomically plausible, not fantasy. Single soft key light from upper left,
 low warm fill, no rim lighting. Muted warm-neutral palette: bone, ochre,
 umber, slate grey, desaturated. Three-quarter view, subject centred, full
-body within frame with generous margin. Isolated on a plain transparent
+body within frame with generous margin. Isolated on a pure black
 background. Matte finish, fine detail, restrained. No dramatic lighting,
 no glow.
 ```
+
+### Amended 2026-08-16 — black background, not transparent
+
+Was "Isolated on a plain transparent background." Image models do not produce
+real alpha; asking for transparency yields either a baked-in checkerboard, a
+flat grey, or an arbitrary backdrop the model invented. Since the requirement
+(§01) is that no rectangle shows against the shifting era ground, the reliable
+route is a **pure black** backdrop composited with `mix-blend-mode: screen`,
+under which black is the identity and vanishes against any ground colour.
+
+Two consequences to design around, not discover later:
+
+- **Screen blending lifts dark tones toward transparency.** It is not a
+  keying operation — deep shadows inside the subject go partly transparent
+  too. The palette clause above (bone, ochre, umber, slate grey) already
+  keeps subjects in the mid-to-light range, which is what makes this
+  workable; a subject rendered dark against black will partly disappear.
+  Reject any generation whose subject sits low in value, however good it
+  looks on its own.
+- **The era ground shows through the subject's darker passages.** A specimen
+  will pick up a faint iron cast in the Archean and a cool one in the
+  Quaternary. This is arguably correct — the specimen sits *in* its era
+  rather than on top of it — but it does mean the stills are not colour-
+  neutral, and they must be judged against the live gradient (§06 step 5),
+  never against a flat swatch.
 
 ### Why each clause is load-bearing
 
@@ -30,7 +55,7 @@ no glow.
 | "Single soft key from upper left" | Lighting direction is the fastest tell of a mismatched set. |
 | "Muted warm-neutral palette, desaturated" | Keeps 28 images from fighting each other or the wall behind them. |
 | "Three-quarter view, centred, generous margin" | Consistent framing across wildly different body plans. |
-| **"Isolated on a plain transparent background"** | **Critical.** The page background interpolates across geological eras — a baked-in backdrop will show as a visible rectangle against a shifting wall. |
+| **"Isolated on a pure black background"** | **Critical.** The page background interpolates across geological eras — a baked-in backdrop shows as a visible rectangle against a shifting wall. Pure black is the one colour that can be cancelled in CSS without real alpha. |
 | "Matte, no glow, no dramatic lighting" | Stops the generator reaching for the default sci-fi treatment. |
 
 ---
@@ -109,7 +134,7 @@ Lock these across the whole set. Varying any of them breaks the set.
 | Parameter | Value | Note |
 |---|---|---|
 | Aspect ratio | **1:1** | Same slot in every plate; the layout is a fixed frame. |
-| Background | **Transparent** | Non-negotiable — see §01. Fall back to flat `#14171B` only if transparency is unavailable, and then re-check against the era gradient. |
+| Background | **Pure black `#000000`** | Non-negotiable — see §01. Composited with `mix-blend-mode: screen`, under which pure black is the identity and disappears against any era ground. Do **not** substitute `#14171B` or any near-black: screen only cancels *exact* black, and a near-black backdrop leaves a visible lifted rectangle. |
 | Resolution | Generate large, downscale for ship | Two width variants, per the media budget. |
 | Ship format | **WebP** | Consistent with the frame-sequence decision. |
 | Per-image budget | Keep the 28-image set well under the page-weight ceiling | Lazy-load everything below the fold. |
