@@ -305,8 +305,18 @@ for (const diagram of diagrams) diagramObserver.observe(diagram);
 // own worked example ("Plate VII of XVI · Carboniferous") pairs a discrete
 // ordinal with a continuously-updating absolute date.
 let anchors: number[] = [];
+
+// Document coordinates, via getBoundingClientRect rather than offsetTop.
+// offsetTop is relative to the nearest positioned ancestor, so it silently
+// changed meaning the moment #lineage gained `position: relative` to carry
+// the trunk — every anchor shifted by the header's height while still being
+// compared against window.scrollY, which is absolute. getBoundingClientRect
+// + scrollY cannot drift that way whatever any ancestor's position is.
 function recomputeAnchors(): void {
-  anchors = rows.map((row) => row.offsetTop + row.offsetHeight / 2);
+  anchors = rows.map((row) => {
+    const rect = row.getBoundingClientRect();
+    return rect.top + window.scrollY + rect.height / 2;
+  });
 }
 recomputeAnchors();
 window.addEventListener("resize", recomputeAnchors);
@@ -348,6 +358,62 @@ function updateGauge(): void {
 }
 window.addEventListener("scroll", updateGauge, { passive: true });
 updateGauge();
+
+// Fallback for the case time-scaled pacing created: a spacer can now be
+// sixteen viewports tall, so across most of the page NO plate intersects the
+// activation band and the IntersectionObserver has nothing to report. While
+// you scroll continuously that is correct — the last plate you passed is
+// still the one you're travelling from. But a jump that lands mid-spacer (a
+// scrollbar drag, an in-page link, a restored scroll position on reload)
+// leaves whatever was current before, and the gauge then contradicts itself:
+// "Plate I · Ordovician · 448 million years", with the announcer telling a
+// screen-reader user they are at LUCA while they are at jawed fish.
+//
+// Resolving to the nearest plate whenever nothing intersects keeps the
+// ordinal, the announcer and the date telling one story. This is a driver
+// fix: it goes through the state machine's existing goTo, so the "exactly
+// one current, no skipping, all reachable" contract in src/lineage-state.ts
+// is untouched and its tests still pass unmodified.
+function resolveCurrentWhenNoPlateIntersects(): void {
+  if (intersecting.size > 0) return;
+  const viewportCenter = window.scrollY + window.innerHeight / 2;
+  let bestIndex = state.getCurrentIndex();
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (const [index, anchor] of anchors.entries()) {
+    const distance = Math.abs(anchor - viewportCenter);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestIndex = index;
+    }
+  }
+  if (bestIndex !== state.getCurrentIndex()) {
+    state.goTo(bestIndex);
+    renderCurrent(false);
+  }
+}
+// Debounced to when scrolling settles, not fired on every scroll event.
+// Running it live fought the keyboard driver: moveTo() sets the current node
+// and then smooth-scrolls to it, and the fallback re-resolved on every frame
+// of that animation, dragging `current` back to whatever the animation was
+// passing over. Pressing Home from the bottom of the page left you on plate
+// 28. Waiting for the scroll to settle removes the conflict entirely — by
+// then the keyboard's target plate is centred, so the fallback agrees with
+// it instead of overriding it.
+//
+// It also happens to be the more correct behaviour for reading: mid-spacer
+// you are *between* plates, so the ordinal should stay on the one you last
+// passed rather than flickering. The era and date readouts are what move
+// continuously through a gap; the ordinal is a discrete position.
+let settleTimer: number | undefined;
+window.addEventListener(
+  "scroll",
+  () => {
+    if (settleTimer !== undefined) clearTimeout(settleTimer);
+    settleTimer = window.setTimeout(resolveCurrentWhenNoPlateIntersects, 150);
+  },
+  { passive: true },
+);
+resolveCurrentWhenNoPlateIntersects();
 
 // Keyboard driver: never intercepts a typing target or the chapter-jump
 // disclosure, so Tab and the nav's own links behave normally. Does call
