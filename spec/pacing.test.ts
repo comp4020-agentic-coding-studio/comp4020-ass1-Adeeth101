@@ -88,10 +88,15 @@ describe("spacerHeightsVh", () => {
   });
 
   it("still hits the target when the floor has to lift several spacers", () => {
-    // Ages contrived so most gaps are far below the floor's fair share and
-    // one dwarfs everything, forcing several waterfall passes.
-    const contrived = [10_000, 20, 19, 18, 17, 16, 15, 0];
+    // One gap dwarfing the rest by four orders of magnitude, so the small
+    // ones land far under the floor and several waterfall passes are needed.
+    // The disparity is deliberately extreme rather than merely large: a
+    // milder version stops exercising the floor at all the moment
+    // TARGET_TOTAL_VH is tuned upward, and would then pass without testing
+    // anything.
+    const contrived = [1e9, 20, 19.9, 19.8, 19.7, 19.6, 19.5, 0];
     const result = spacerHeightsVh(contrived);
+    expect(result.filter((h) => h === MIN_SPACER_VH).length).toBeGreaterThan(1);
     expect(result.reduce((sum, h) => sum + h, 0)).toBeCloseTo(TARGET_TOTAL_VH, 6);
     for (const height of result) expect(height).toBeGreaterThanOrEqual(MIN_SPACER_VH);
   });
@@ -140,9 +145,13 @@ describe("markersFor", () => {
 
   it("interpolates the age between the two nodes", () => {
     const markers = markersFor(1000, 4200, 1900);
-    const halfway = markers.find((m) => m.offsetVh === 500);
-    expect(halfway?.ageMa).toBeCloseTo(3050);
+    expect(markers.length).toBeGreaterThan(0);
     for (const marker of markers) {
+      // Checked against the offset rather than at one hand-picked marker,
+      // which stops the assertion depending on MARKER_INTERVAL_VH dividing
+      // the height into a round number.
+      const t = marker.offsetVh / 1000;
+      expect(marker.ageMa, `at ${marker.offsetVh}vh`).toBeCloseTo(4200 + (1900 - 4200) * t);
       expect(marker.ageMa).toBeLessThan(4200);
       expect(marker.ageMa).toBeGreaterThan(1900);
     }

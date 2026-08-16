@@ -26,7 +26,7 @@ export const PACING_EXPONENT = 0.45;
 // independent: changing the exponent redistributes the page without
 // lengthening it, changing the target lengthens the page without changing
 // the shape.
-export const TARGET_TOTAL_VH = 6000;
+export const TARGET_TOTAL_VH = 9000;
 
 // Floor for any single spacer, in vh, so no gap fully collapses. Without it
 // the 0.3 Ma H. sapiens → you step shrinks to nothing and the last two
@@ -42,7 +42,12 @@ export const MIN_SPACER_VH = 25;
 // nothing on their own in the dense modern gaps: those spacers never clear
 // the threshold. The emptiness is the point — the marks only prove motion.
 export const MARKER_MIN_SPACER_VH = 200;
-export const MARKER_INTERVAL_VH = 100;
+
+// Below one viewport height on purpose: at 100 a marker was only ever
+// exactly one screen from the next, so whether one was visible depended on
+// where the reader happened to stop. At 65 there is always at least one in
+// view inside a marked spacer, which is the whole job.
+export const MARKER_INTERVAL_VH = 65;
 
 // Raw, un-normalized weight of a single gap. Zero, negative and non-finite
 // gaps weigh nothing rather than producing NaN — `(-1) ** 0.45` is NaN, and
