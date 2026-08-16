@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { LINEAGE } from "../src/data/lineage";
 import {
@@ -103,6 +105,28 @@ describe("spacerHeightsVh", () => {
   it("returns nothing for zero or one node", () => {
     expect(spacerHeightsVh([])).toEqual([]);
     expect(spacerHeightsVh([100])).toEqual([]);
+  });
+});
+
+// The pacing bug this rework fixed was invisible for a reason worth wiring a
+// sensor against: main.ts set a `--weight` custom property on every row and
+// no CSS rule ever read it. Every unit test passed, the build was green, the
+// page looked plausible, and the entire feature did nothing. A custom
+// property is a contract between two files that no compiler checks, so this
+// checks it — it fails on exactly the mistake that hid the original bug.
+describe("custom properties main.ts sets", () => {
+  it("are all actually read by the stylesheet", () => {
+    const main = readFileSync(resolve("main.ts"), "utf8");
+    const css = readFileSync(resolve("styles.css"), "utf8");
+    const set = [...main.matchAll(/setProperty\(\s*"(--[a-z0-9-]+)"/gi)].map((m) => m[1]);
+
+    expect(set.length, "no setProperty calls found — has main.ts moved?").toBeGreaterThan(0);
+    for (const property of new Set(set)) {
+      expect(
+        css.includes(`var(${property})`) || css.includes(`var(${property},`),
+        `main.ts sets ${property} but no rule in styles.css reads it — dead pacing`,
+      ).toBe(true);
+    }
   });
 });
 
