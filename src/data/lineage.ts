@@ -205,13 +205,14 @@ export const LINEAGE: LineageNode[] = [
     name: "The first tetrapod",
     age: 365,
     ageRange: [365, 390],
-    branch: "lungfish, coelacanth",
+    branch:
+      "lungfish and coelacanths — strictly, their lines had already parted from yours by ~390 million years ago",
     branchExamples: ["lungfish", "coelacanth"],
     gained: "digits. The money-shot sequence lands here.",
     stillWithYou: "count your fingers — that number was set here",
     source:
       "Nature 2025 amniote-trackway paper pushes this older than traditionally thought — https://www.nature.com/articles/s41586-025-08884-5; PMC3338709 phylogenomic estimate",
-    note: "This stretch of the line compresses a genuinely contested, still-being-revised span, not a single clean instant.",
+    note: "This stretch of the line compresses a genuinely contested, still-being-revised span, not a single clean instant. The branch text was corrected in the science-accuracy audit (docs/IMAGE-PROMPTS.md §05, item 13): this node's age is the Acanthostega fossil date, which is what the digits claim needs, but the cited source (PMC3338709) puts the lungfish/tetrapod split at ~392 Ma and coelacanths part earlier still — so the cousins do not leave at 365 Ma. Fixed in the rendered branch text with the same in-line honesty the Homo sapiens node already uses, rather than by moving the node and breaking the trait.",
   },
   {
     id: "amniota",
@@ -349,10 +350,10 @@ export const LINEAGE: LineageNode[] = [
     branch: "",
     branchExamples: [],
     gained:
-      "upright, full-time; stone tools; later, with H. erectus, control of fire and long-distance walking",
+      "upright, full-time; and the Oldowan — the first stone tools this genus made, from ~2.6 million years ago",
     source:
-      "Genus-origin dating and Lomekwi/Oldowan stone-tool dating, standard paleoanthropological consensus",
-    note: "The Australopithecus-to-Homo transition is genuinely unresolved, not just contested in degree — see Royal Society 2015, \"From Australopithecus to Homo: the transition that wasn't\" (https://royalsocietypublishing.org/doi/10.1098/rstb.2015.0248). That's why Australopithecus is folded into this node's lead-up rather than given its own line, per docs/DESIGN.md §7.",
+      "LD 350-1, the oldest Homo fossil, dated 2.80–2.75 Ma: Villmoare et al. 2015, Science — https://www.science.org/doi/10.1126/science.aaa1343. Oldowan stone tools from ~2.6 Ma; the older Lomekwi 3 industry (3.3 Ma — Harmand et al. 2015, Nature — https://www.nature.com/articles/nature14464) predates this genus and is not attributed to it.",
+    note: "Source and traits corrected in the science-accuracy audit (docs/IMAGE-PROMPTS.md §05, items 11–12). The old source field read \"standard paleoanthropological consensus\", which renders on the page under the heading Source and asks the reader to take on trust the one thing this piece is arguing is checkable. The old gained field credited this genus with the Lomekwi 3 tools (3.3 Ma, half a million years before this node, not attributed to Homo) and with control of fire — whose earliest secure evidence is ~1 Ma at Wonderwerk, habitual only from ~400 ka, so hanging it here compressed nearly 2 Myr into one plate. The Australopithecus-to-Homo transition is genuinely unresolved, not just contested in degree — see Royal Society 2015, \"From Australopithecus to Homo: the transition that wasn't\" (https://royalsocietypublishing.org/doi/10.1098/rstb.2015.0248). That's why Australopithecus is folded into this node's lead-up rather than given its own line, per docs/DESIGN.md §7.",
   },
   {
     id: "homo-sapiens",
