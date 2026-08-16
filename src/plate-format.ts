@@ -61,6 +61,30 @@ export function eraFor(ageMa: number): string {
   return "Hadean";
 }
 
+// The body rows of a plate (spec §05), decided here rather than in the render
+// loop so the rule is testable without a DOM.
+//
+// The rule: a plate never shows a label it cannot fill. Three nodes in this
+// dataset — Amorphea, Holozoa, Boreoeutheria — have no trait that survives the
+// science-accuracy rule in CLAUDE.md, and each says so in its own `note`. Their
+// emptiness is a finding, not a gap waiting to be filled, so the page has to
+// handle it as a real case: the heading is omitted entirely, not printed above
+// nothing.
+export interface PlateFact {
+  label: string;
+  text: string;
+}
+
+export function plateFacts(node: { gained: string; stillWithYou?: string }): PlateFact[] {
+  const rows: [string, string | undefined][] = [
+    ["What changed in you", node.gained],
+    ["Still with you", node.stillWithYou],
+  ];
+  return rows
+    .filter(([, text]) => text !== undefined && text.trim() !== "")
+    .map(([label, text]) => ({ label, text: text as string }));
+}
+
 export function formatAge(ageMa: number): string {
   if (ageMa >= 1000) {
     const ga = ageMa / 1000;

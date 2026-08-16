@@ -12,7 +12,7 @@ import { LINEAGE, type LineageNode } from "./src/data/lineage";
 import { createLineage } from "./src/lineage-state";
 import { backgroundCssAt } from "./src/era-palette";
 import { markersFor, spacerHeightsVh } from "./src/pacing";
-import { eraFor, formatAge, romanNumeral } from "./src/plate-format";
+import { eraFor, formatAge, plateFacts, romanNumeral } from "./src/plate-format";
 
 function required<T>(value: T | null, selector: string): T {
   if (value === null) {
@@ -155,13 +155,16 @@ for (const [index, node] of LINEAGE.entries()) {
 
   const body = document.createElement("div");
   body.className = "plate-body";
-  const gained = document.createElement("p");
-  gained.innerHTML = `<strong>What changed in you:</strong> ${node.gained}`;
-  body.append(gained);
-  if (node.stillWithYou) {
-    const still = document.createElement("p");
-    still.innerHTML = `<strong>Still with you:</strong> ${node.stillWithYou}`;
-    body.append(still);
+  // Which rows exist is decided by plateFacts, not here — see its comment in
+  // src/plate-format.ts and the contract in spec/plate-format.test.ts. A node
+  // with no defensible trait renders no heading at all, rather than a bold
+  // label standing above nothing.
+  for (const fact of plateFacts(node)) {
+    const row = document.createElement("p");
+    const label = document.createElement("strong");
+    label.textContent = `${fact.label}:`;
+    row.append(label, ` ${fact.text}`);
+    body.append(row);
   }
 
   const cap = document.createElement("div");
