@@ -49,19 +49,34 @@ export interface PlateImage {
 // two numbers against styles.css so they cannot drift apart in silence.
 const DISPLAY_SIZES = "(width >= 720px) 200px, 240px";
 
-const EVIDENCE: Record<ImageBucket, { alt: string; tag: string }> = {
+interface Evidence {
+  alt: string;
+  tag: string;
+  generated: boolean;
+}
+
+const EVIDENCE: Record<ImageBucket, Evidence> = {
   A: {
     alt: "reconstructed from fossil material",
     tag: "AI reconstruction · from fossil material",
+    generated: true,
   },
   "A-partial": {
     alt: "reconstructed only partly from fossil material — the rest extrapolated from a relative",
     tag: "AI reconstruction · partly from fossil material",
+    generated: true,
   },
   B: {
     alt: "inferred: no fossil constrains its appearance",
     tag: "AI reconstruction · inferred, no fossil record",
+    generated: true,
   },
+};
+
+const STAND_IN = {
+  alt: "a schematic stand-in, not a reconstruction: no still has been generated for this node",
+  tag: "Illustration · not a reconstruction",
+  generated: false,
 };
 
 export function plateImage(
@@ -77,7 +92,15 @@ export function plateImage(
   // Sorted here rather than trusted from the caller: the glob returns files in
   // whatever order the filesystem hands over, and src has to be the smallest.
   const variants = [...sources].sort((a, b) => a.width - b.width);
-  const evidence = EVIDENCE[bucket];
+  // A hand-drawn stand-in is not a reconstruction of anything, so it does not
+  // get the node's evidence tag. The bucket is still true about the *node* —
+  // it just is not what this picture is, and captioning a diagram of a jaw
+  // fragment "partly from fossil material" would be a claim about evidence
+  // that nothing supports. SVG is the marker because every generated still is
+  // WebP; see images/plates/*.svg.
+  const evidence = variants.every((variant) => variant.format === "svg")
+    ? STAND_IN
+    : EVIDENCE[bucket];
 
   return {
     src: variants[0].url,
@@ -86,7 +109,9 @@ export function plateImage(
         ? variants.map((variant) => `${variant.url} ${variant.width}w`).join(", ")
         : null,
     sizes: variants.length > 1 ? DISPLAY_SIZES : null,
-    alt: `${node.name} — AI-generated reconstruction, ${evidence.alt}.`,
+    alt: evidence.generated
+      ? `${node.name} — AI-generated reconstruction, ${evidence.alt}.`
+      : `${node.name} — ${evidence.alt}.`,
     tag: evidence.tag,
     // Only the first plate is in the viewport at load. Nothing is preloaded:
     // 27 more squares fetched up front would be the slow-connection failure

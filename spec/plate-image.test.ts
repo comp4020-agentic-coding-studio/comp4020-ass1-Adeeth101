@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { LINEAGE } from "../src/data/lineage";
@@ -60,6 +60,39 @@ describe("plateImage", () => {
   });
 });
 
+// Eleven nodes have no generated still and carry a hand-drawn schematic
+// instead. The evidence tag is built from the node's bucket, so without this
+// rule a diagram of a jaw fragment would be captioned "AI reconstruction ·
+// partly from fossil material" — a claim about evidence that nothing supports.
+// The bucket is still right about the *node*; it is simply not what this
+// picture is.
+describe("plateImage stand-ins", () => {
+  const STAND_IN = [{ url: "/homo.svg", width: 0, format: "svg" }];
+
+  it("never lets a stand-in inherit the node's evidence tag", () => {
+    const drawn = plateImage({ id: "homo", name: "n" }, 1, STAND_IN);
+    const generated = plateImage({ id: "homo", name: "n" }, 1, STILL);
+    expect(drawn?.tag).not.toBe(generated?.tag);
+    expect(drawn?.tag).not.toMatch(/fossil material/i);
+  });
+
+  it("says it is an illustration and not a reconstruction, in the tag and the alt text", () => {
+    const drawn = plateImage({ id: "homo", name: "Early Homo" }, 1, STAND_IN);
+    expect(drawn?.tag).toMatch(/illustration/i);
+    expect(drawn?.tag).toMatch(/not a reconstruction/i);
+    expect(drawn?.alt).toContain("Early Homo");
+    expect(drawn?.alt).toMatch(/not a reconstruction/i);
+  });
+
+  it("does not call a stand-in AI-generated, because it is not one", () => {
+    expect(plateImage({ id: "homo", name: "n" }, 1, STAND_IN)?.alt).not.toMatch(/AI-generated/i);
+  });
+
+  it("still refuses to render one for a node with no bucket at all", () => {
+    expect(plateImage({ id: "you", name: "You" }, 1, STAND_IN)).toBeNull();
+  });
+});
+
 // A 1:1 still is displayed at 200–240 CSS px and nowhere near its full size, so
 // serving one width would mean shipping roughly four times the bytes a phone
 // needs. These are the contracts that make the second variant actually work:
@@ -102,6 +135,36 @@ describe("plateImage width variants", () => {
     expect(plateImage(TETRAPODA, 1, STILL)?.sizes).toBe(
       `(width >= 720px) ${column}, ${cap}`,
     );
+  });
+});
+
+describe("the plate assets on disk", () => {
+  const files = readdirSync(resolve(import.meta.dirname, "../images/plates"));
+
+  it("gives every node except You a picture of some kind", () => {
+    const covered = new Set(files.map((file) => file.replace(/(-\d+)?\.\w+$/, "")));
+    for (const node of LINEAGE) {
+      if (node.id === "you") continue;
+      expect(covered.has(node.id), `${node.id}: no image and no stand-in`).toBe(true);
+    }
+  });
+
+  it("names every asset after a real node, so nothing lands unrendered", () => {
+    const ids = new Set(LINEAGE.map((node) => node.id));
+    for (const file of files) {
+      expect(ids.has(file.replace(/(-\d+)?\.\w+$/, "")), `${file}: not a node id`).toBe(true);
+    }
+  });
+
+  it("ships both width variants for every generated still", () => {
+    const widths = new Map<string, number[]>();
+    for (const file of files.filter((f) => f.endsWith(".webp"))) {
+      const [, id, width] = /^(.+)-(\d+)\.webp$/.exec(file) ?? [];
+      widths.set(id, [...(widths.get(id) ?? []), Number(width)]);
+    }
+    for (const [id, found] of widths) {
+      expect([...found].sort((a, b) => a - b), `${id}: incomplete variants`).toEqual([512, 1024]);
+    }
   });
 });
 

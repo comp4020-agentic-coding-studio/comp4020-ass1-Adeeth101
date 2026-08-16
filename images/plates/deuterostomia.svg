@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!--
+    A soft tube with one plain opening at each end. Which end becomes the mouth cannot be drawn, so it is not implied.
+
+    A schematic stand-in, not a reconstruction and not generated: no still
+    exists for this node yet. Drawn to the same constraints as a real still
+    (pure #000000 ground for the screen blend, 1:1, mid-to-light values) so the
+    plate reads as a plate rather than as a gap. src/plate-image.ts tags it
+    "Illustration · not a reconstruction" rather than giving it the node's
+    evidence bucket, because claiming fossil support for a diagram would be a
+    false claim about evidence.
+  -->
+  <rect width="512" height="512" fill="#000000"/>
+
+  <g fill="none" stroke="#c9bda6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M140 256 C140 214 172 190 216 190 L296 190 C340 190 372 214 372 256 C372 298 340 322 296 322 L216 322 C172 322 140 298 140 256 Z"/>
+    <g stroke="#8a8069" stroke-width="3">
+      <path d="M178 256 L334 256"/>
+      <ellipse cx="166" cy="256" rx="10" ry="20"/>
+      <ellipse cx="346" cy="256" rx="10" ry="20"/>
+    </g>
+  </g>
+
+  <text x="256" y="470" fill="#6f6a60" font-family="sans-serif" font-size="17" letter-spacing="5" text-anchor="middle">ILLUSTRATION</text>
+</svg>
