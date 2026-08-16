@@ -13,6 +13,31 @@ import { createLineage } from "./src/lineage-state";
 import { backgroundCssAt } from "./src/era-palette";
 import { markersFor, spacerHeightsVh } from "./src/pacing";
 import { eraFor, formatAge, plateFacts, romanNumeral } from "./src/plate-format";
+import { plateImage } from "./src/plate-image";
+
+// Assets are discovered by filename, not listed in code: images/plates/<node
+// id>.<ext>. Dropping tetrapoda.webp into that folder wires up the Tetrapoda
+// plate with no edit here, and a node with no file renders no image slot at
+// all. That is the point — media is landing after the page was built, and
+// CLAUDE.md is explicit that late media must never block the build.
+//
+// Bundled through Vite rather than referenced as a bare path, so every URL is
+// hashed and rewritten relative to the deploy base. A root-absolute path would
+// look fine locally and 404 under /comp4020-ass1-Adeeth101/ — and because the
+// bundler resolves these at build time, a missing file is a build-time absence
+// rather than a runtime 404 with a broken-image icon in the plate.
+const PLATE_ASSET_MODULES = import.meta.glob<string>("./images/plates/*.{webp,png,svg}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+
+const PLATE_ASSETS = new Map<string, string>(
+  Object.entries(PLATE_ASSET_MODULES).map(([path, url]) => [
+    path.slice(path.lastIndexOf("/") + 1, path.lastIndexOf(".")),
+    url,
+  ]),
+);
 
 function required<T>(value: T | null, selector: string): T {
   if (value === null) {
@@ -177,16 +202,48 @@ for (const [index, node] of LINEAGE.entries()) {
   capText.textContent = node.source;
   cap.append(capLabel, capText);
 
-  const plateIn = document.createElement("div");
-  plateIn.className = "plate-in";
-  plateIn.append(num, title);
+  const text = document.createElement("div");
+  text.className = "plate-text";
+  text.append(num, title);
   if (node.branch.trim() !== "") {
     const sub = document.createElement("p");
     sub.className = "plate-sub";
     sub.textContent = `Leaving here, your cousins: ${node.branch}`;
-    plateIn.append(sub);
+    text.append(sub);
   }
-  plateIn.append(body, cap);
+  text.append(body, cap);
+
+  const plateIn = document.createElement("div");
+  plateIn.className = "plate-in";
+  plateIn.append(text);
+
+  // The figure is appended after the text, so DOM order and reading order agree
+  // at both viewports: the placard is read first, and the image column is
+  // placed to its right by grid on desktop rather than by reordering. When
+  // there is no asset, nothing is appended and .plate-in never gets the
+  // two-column template — the plate closes up instead of leaving a hole.
+  const image = plateImage(node, index, PLATE_ASSETS.get(node.id));
+  if (image !== null) {
+    const img = document.createElement("img");
+    img.className = "plate-figure-img";
+    img.src = image.src;
+    img.alt = image.alt;
+    img.loading = image.loading;
+    img.decoding = "async";
+    img.width = 512;
+    img.height = 512;
+
+    // Per docs/IMAGE-STYLE.md §07: the per-image tag does double duty as the
+    // bucket distinction, and the footer carries the fuller disclosure.
+    const tag = document.createElement("figcaption");
+    tag.className = "plate-figure-tag";
+    tag.textContent = image.tag;
+
+    const figure = document.createElement("figure");
+    figure.className = "plate-figure";
+    figure.append(img, tag);
+    plateIn.append(figure);
+  }
 
   const frame = document.createElement("div");
   frame.className = "plate-frame";

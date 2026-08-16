@@ -470,6 +470,8 @@ nav[aria-label="Chapters"] {
 }
 
 .plate-in {
+  display: grid;
+  gap: var(--s4);
   padding: 20px 20px 22px;
   opacity: 0.55;
   transition: opacity var(--dur) var(--ease);
@@ -478,6 +480,95 @@ nav[aria-label="Chapters"] {
 @media (width >= 720px) {
   .plate-in {
     padding: var(--s5) var(--s6) 26px;
+  }
+}
+
+/* ---- The image slot (spec §05, amended) ----
+
+   The plate becomes two columns only when there is actually an image. With no
+   asset there is no .plate-figure, the :has() never matches, and the plate is
+   a single column exactly as before — no reserved column, no hole, nothing to
+   clean up when media lands late. (The `display: grid` this relies on lives in
+   the .plate-in rule above, merged there rather than repeated — stylelint's
+   no-duplicate-selectors catches the split version.) */
+
+@media (width >= 720px) {
+  .plate-in:has(.plate-figure) {
+    grid-template-columns: minmax(0, 1fr) 200px;
+    align-items: start;
+    column-gap: var(--s6);
+  }
+}
+
+.plate-figure {
+  margin: 0;
+
+  /* THE BLEND, and the one part of this that is easy to get subtly wrong.
+
+     Generated stills carry a pure #000000 backdrop because image models do not
+     produce real alpha (docs/IMAGE-STYLE.md §01). `screen` makes black the
+     identity, so the backdrop disappears — but only against the colour that is
+     actually behind the image, and mix-blend-mode blends with its backdrop
+     *within the nearest isolating ancestor*. That is a trap here: .plate-in
+     carries opacity 0.55 when dormant, and any opacity below 1 creates a
+     stacking context, which would isolate the image and leave it screening
+     against nothing — i.e. a visible black square, the exact failure the pure
+     black backdrop was chosen to avoid.
+
+     So the backdrop is not inherited, it is painted here, and `isolation` makes
+     that explicit rather than accidental: the blending group is this element's
+     own background plus the image, whatever any ancestor does later. The
+     background then tracks the era ground the same way the sticky gauge does
+     (var(--bg-now, var(--bg))), and switches to --surface when the plate lights
+     up, so the backdrop always matches what surrounds it in both states.
+
+     Dormant plates dim the whole figure via .plate-in's opacity, background
+     included — and because that background is the same colour as the ground
+     behind it, fading it changes nothing visible. The subject dims with the
+     text, which is what should happen. */
+  isolation: isolate;
+  background: var(--bg-now, var(--bg));
+  transition: background var(--dur) var(--ease);
+}
+
+.plate-on .plate-figure {
+  background: var(--surface);
+}
+
+.plate-figure-img {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  mix-blend-mode: screen;
+}
+
+@media (width >= 720px) {
+  .plate-figure-img {
+    max-width: none;
+  }
+}
+
+/* The tag sits outside the blend — it is page furniture, not part of the
+   picture, and screening it against the ground would wash it out. */
+.plate-figure-tag {
+  max-width: 240px;
+  margin: var(--s2) 0 0;
+  font-family: var(--cond);
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 1.35;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  mix-blend-mode: normal;
+}
+
+@media (width >= 720px) {
+  .plate-figure-tag {
+    max-width: none;
   }
 }
 
@@ -623,4 +714,19 @@ nav[aria-label="Chapters"] {
 
 .site-footer-link {
   color: var(--brass);
+}
+
+/* The AI disclosure (docs/IMAGE-STYLE.md §07). Measure-capped and left-aligned
+   rather than centred like the credit above it: it is four lines of substance
+   that has to be readable, not a sign-off. */
+.site-footer-disclosure {
+  max-width: 62ch;
+  margin: var(--s5) auto 0;
+  text-align: left;
+  text-wrap: pretty;
+}
+
+.site-footer-lede {
+  color: var(--text-2);
+  font-weight: 500;
 }
