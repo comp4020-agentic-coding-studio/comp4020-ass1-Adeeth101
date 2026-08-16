@@ -10,7 +10,7 @@
 
 import { LINEAGE, type LineageNode } from "./src/data/lineage";
 import { createLineage } from "./src/lineage-state";
-import { gapToNextMa, sectionHeightVh } from "./src/pacing";
+import { markersFor, spacerHeightsVh } from "./src/pacing";
 import { eraFor, formatAge, romanNumeral } from "./src/plate-format";
 
 function required<T>(value: T | null, selector: string): T {
@@ -35,12 +35,17 @@ const gaugeDateEl = required(document.querySelector<HTMLElement>("#gauge-date"),
 
 const state = createLineage(LINEAGE.map((node) => ({ id: node.id })));
 
-// Time-scaled pacing (docs/DESIGN.md §4): a section's height is the elapsed
-// time to the next node on a log10 scale, computed by the pure module in
-// src/pacing.ts. Layout is the only thing that changes — which node is
-// current still comes entirely from src/lineage-state.ts, so this needs no
-// custom scroll physics (docs/DESIGN.md §2).
+// Time-scaled pacing (docs/DESIGN.md §4): plates render at their natural
+// height and the elapsed time to the next node becomes a separate spacer
+// element after each one, sized by the pure module in src/pacing.ts. Keeping
+// the gap out of the plate is what makes plate size and gap size
+// independently tunable — no pacing change can resize a plate.
+//
+// Layout is the only thing this affects: which node is current still comes
+// entirely from src/lineage-state.ts, so this needs no custom scroll physics
+// (docs/DESIGN.md §2).
 const AGES = LINEAGE.map((node) => node.age);
+const SPACER_HEIGHTS_VH = spacerHeightsVh(AGES);
 
 // Only one cousin branch in this dataset is genuinely extinct — every other
 // non-empty `branch` field (see src/data/lineage.ts) describes a lineage
@@ -76,6 +81,33 @@ function branchSvgLabel(node: LineageNode): string {
     ? "did not survive to today"
     : "continues today as a separate lineage, not yours";
   return `Branch diagram: your lineage continues; a cousin branch splits off here and ${fate}.`;
+}
+
+// The elapsed time between one plate and the next, as empty scroll distance.
+// Returns null after the last node, which has nothing to be distant from.
+//
+// Marked aria-hidden: a spacer carries no information a screen reader
+// doesn't already get from the depth gauge, and LUCA's alone would otherwise
+// interrupt the reading order with ten redundant date announcements.
+function spacerAfter(index: number): HTMLElement | null {
+  const heightVh = SPACER_HEIGHTS_VH[index];
+  if (heightVh === undefined) return null;
+
+  const spacer = document.createElement("div");
+  spacer.className = "node-spacer";
+  spacer.setAttribute("aria-hidden", "true");
+  spacer.style.setProperty("--gap", `${heightVh.toFixed(2)}vh`);
+
+  // Only the long deep-time spacers get these; the modern gaps are too short
+  // to clear the threshold, so they come back empty on their own.
+  for (const { offsetVh, ageMa } of markersFor(heightVh, AGES[index], AGES[index + 1])) {
+    const mark = document.createElement("p");
+    mark.className = "spacer-mark";
+    mark.style.setProperty("--at", `${offsetVh.toFixed(2)}vh`);
+    mark.textContent = `${eraFor(ageMa)} · ${formatAge(ageMa)} ago`;
+    spacer.append(mark);
+  }
+  return spacer;
 }
 
 const plates: HTMLElement[] = [];
@@ -141,16 +173,9 @@ for (const [index, node] of LINEAGE.entries()) {
   row.className = "node-row";
   row.append(plate, diagram);
 
-  // The pacing space sits on a wrapper rather than on the row itself: the
-  // row stretches its plate and branch diagram to a shared height, so a
-  // 218vh row would mean a 218vh-tall plate frame with text at the top.
-  // The wrapper centres a natural-height row inside the time-scaled space.
-  const section = document.createElement("div");
-  section.className = "node-section";
-  section.style.setProperty("--pace", `${sectionHeightVh(gapToNextMa(AGES, index)).toFixed(2)}vh`);
-  section.append(row);
-
-  lineageEl.append(section);
+  lineageEl.append(row);
+  const spacer = spacerAfter(index);
+  if (spacer !== null) lineageEl.append(spacer);
   plates.push(plate);
   rows.push(row);
   diagrams.push(diagram);

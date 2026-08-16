@@ -301,30 +301,6 @@ nav[aria-label="Chapters"] {
   }
 }
 
-/* Time-scaled pacing (spec §04, docs/DESIGN.md §4). `--pace` is set inline
-   per section from src/pacing.ts — log10 of the elapsed time to the next
-   node, clamped to 40vh–220vh. It's a min-height, not a height, so a plate
-   whose text runs longer than its allotted time is never clipped; the
-   fallback value only applies if the inline property is missing. */
-.node-section {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: var(--pace, 100vh);
-}
-
-/* A floor between sections for the case where a plate's own content
-   already exceeds its pacing space, so two sections can't ever touch. */
-.node-section + .node-section {
-  margin-top: 32px;
-}
-
-@media (width >= 720px) {
-  .node-section + .node-section {
-    margin-top: var(--s7);
-  }
-}
-
 .node-row {
   display: flex;
   flex-direction: column;
@@ -332,7 +308,6 @@ nav[aria-label="Chapters"] {
   max-width: calc(940px + var(--s7) + var(--s8));
   margin-inline: auto;
   gap: var(--s5);
-  width: 100%;
 }
 
 @media (width >= 720px) {
@@ -341,6 +316,39 @@ nav[aria-label="Chapters"] {
     align-items: stretch;
     gap: var(--s7);
   }
+}
+
+/* ---- Time-scaled pacing (docs/DESIGN.md §4) ---- */
+
+/* The elapsed time between two plates, as empty scroll distance. `--gap` is
+   set inline per spacer from src/pacing.ts. A fixed height, not a min-height:
+   the plate above it is already at its natural height, so there is nothing
+   here that could overflow. Every .node-row is separated by one of these, so
+   no row-to-row margin is needed — the floor in src/pacing.ts guarantees the
+   separation instead. */
+.node-spacer {
+  position: relative;
+  height: var(--gap, 25vh);
+}
+
+/* Faint proof of motion down the long deep-time stretches, so a reader
+   crossing eleven screens of emptiness can tell the page is still
+   responding. Aligned to the content column, same type treatment as the
+   depth gauge's own readout so it reads as the same instrument. */
+.spacer-mark {
+  position: absolute;
+  top: var(--at, 0);
+  right: 0;
+  left: 0;
+  max-width: calc(940px + var(--s7) + var(--s8));
+  margin-inline: auto;
+  font-family: var(--cond);
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  opacity: 0.8;
 }
 
 /* ---- Branch-line diagram (spec §07) ---- */
