@@ -243,22 +243,26 @@ export const LINEAGE: LineageNode[] = [
     ageRange: [205, 230],
     branch: "",
     branchExamples: [],
-    gained: "jaw bones become ear bones; milk; fur",
+    gained:
+      "milk, and a jaw hinge that has begun its migration into the middle ear — but not yet fur: the oldest preserved fur is about 60 million years younger than this",
     stillWithYou: "you hear with bones that used to be your ancestor's jaw hinge",
     source:
-      "Adelobasileus/Brasilodon fossil dating — https://en.wikipedia.org/wiki/Adelobasileus; jaw-to-ear transformation, eLife — https://elifesciences.org/articles/57860",
+      "Jaw-to-ear transition: eLife 2020, \"Transient role of the middle ear as a lower jaw support across mammals\" — https://elifesciences.org/articles/57860, and Nature 2024, \"Fossils document evolutionary changes of jaw joint to mammalian middle ear\" — https://www.nature.com/articles/s41586-024-07235-0. Earliest preserved mammaliaform fur: Castorocauda (~164 Ma, Ji et al. 2006) and Megaconus (~165 Ma, Zhou et al. 2013, Nature) — https://news.uchicago.edu/story/fossil-indicates-hairy-squirrel-sized-creature-was-not-quite-mammal",
+    note: "Corrected in the science-accuracy audit (docs/IMAGE-PROMPTS.md §05, items 1–3). The draft claimed fur here; the earliest preserved mammaliaform fur is ~60 Myr younger, so fur at 225 Ma is inference from much later relatives, not a fact about this animal. It also stated the jaw-to-ear transfer as finished, when at the Morganucodon grade the postdentary bones still sit in a trough on the dentary and the ancestral jaw joint is still present alongside the new one. The old source cited Adelobasileus, which is a partial skull with no postcrania and sits outside Mammaliaformes — it cannot anchor either trait.",
   },
   {
-    id: "placentalia",
-    name: "Placentalia",
+    id: "eutheria",
+    name: "Eutheria — the line that leads to the placenta",
     age: 160,
     ageRange: [157, 210],
-    branch: "platypus, echidna, marsupials",
-    branchExamples: ["platypus", "echidna", "kangaroos"],
-    gained: "the placenta; live birth",
+    branch:
+      "marsupials — kangaroos, koalas; the platypus and echidna's line had already left, ~166–200 million years ago",
+    branchExamples: ["kangaroos", "koalas"],
+    gained:
+      "the branch that leads to the placenta, not the placenta itself — Juramaia's close relative Eomaia still carries epipubic bones, which mean a narrow birth canal and tiny, barely-developed young",
     source:
-      "Nature 2011 Jurassic eutherian fossil — https://www.nature.com/articles/nature10291; Royal Society phylogenomic placental timescale — https://royalsocietypublishing.org/doi/full/10.1098/rspb.2012.0683",
-    note: "A genuinely unsettled figure, sharpened significantly by a 2011 fossil find. Crown Placentalia's own radiation is younger, ~90–100 Ma.",
+      "Luo et al. 2011, Nature, \"A Jurassic eutherian mammal and divergence of marsupials and placentals\" — https://www.nature.com/articles/nature10291 (the fossil that dates this split, and a eutherian rather than a crown placental); crown Placentalia is much younger — dos Reis et al. 2012 — https://royalsocietypublishing.org/doi/full/10.1098/rspb.2012.0683 and Álvarez-Carretero et al. 2022, Nature — https://www.nature.com/articles/s41586-021-04341-1 (83.3–77.6 Ma); monotreme/therian split ~166–200 Ma, reviewed in Alcheringa 2022 — https://www.tandfonline.com/doi/full/10.1080/03115518.2022.2025900",
+    note: "Renamed from \"Placentalia\" in the science-accuracy audit (docs/IMAGE-PROMPTS.md §05, items 4–6). At 160 Ma, anchored on Juramaia, this is the Eutheria/Metatheria split — the title of the paper it cites says exactly that — not crown Placentalia, whose estimates run 83–78 Ma (Álvarez-Carretero et al. 2022), ~102 Ma (Foley et al. 2023) or 67.3 Ma in the fossil record. The old branch list merged two splits tens of millions of years apart: monotremes leave at the monotreme/therian split, not here. The old \"gained: the placenta; live birth\" was wrong twice over — marsupials have both, so neither separates this branch from the cousins leaving at it, and Eomaia's retained epipubic bones point the other way entirely.",
   },
   {
     id: "boreoeutheria",
