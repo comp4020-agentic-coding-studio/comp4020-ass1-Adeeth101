@@ -9,6 +9,10 @@
     "Illustration · not a reconstruction" rather than giving it the node's
     evidence bucket, because claiming fossil support for a diagram would be a
     false claim about evidence.
+
+    That caption is the only label. An earlier version also drew the word
+    ILLUSTRATION into the picture, which put the same word twice in a row on
+    the rendered plate — visible on the page, invisible in the diff.
   -->
   <rect width="512" height="512" fill="#000000"/>
 
@@ -25,6 +29,4 @@
       <circle cx="166" cy="264" r="4"/>
     </g>
   </g>
-
-  <text x="256" y="470" fill="#6f6a60" font-family="sans-serif" font-size="17" letter-spacing="5" text-anchor="middle">ILLUSTRATION</text>
 </svg>
