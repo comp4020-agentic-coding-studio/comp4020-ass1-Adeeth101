@@ -22,6 +22,17 @@ function htmlEntries(dir = "."): string[] {
 export default defineConfig({
   base: "./",
   build: {
+    // Frame-sequence frames are never inlined, however small they are. Vite's
+    // 4 kB default swallowed 119 of the 208 frames into the JS bundle as
+    // base64, taking it from 64 kB to 428 kB: base64 costs a third more bytes
+    // than binary, the frames stop being separately cacheable, and every one
+    // of them has to be parsed before the page can run — for images most
+    // readers will never scroll to. Everything else keeps the default, which
+    // is what inlines the small SVG stand-ins.
+    assetsInlineLimit: (filePath: string) =>
+      filePath.includes("images/frames/") || filePath.includes("images\\frames\\")
+        ? false
+        : undefined,
     rollupOptions: {
       input: htmlEntries(),
     },

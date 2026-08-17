@@ -47,7 +47,9 @@ export interface PlateImage {
 // image is viewport-width and always takes the largest file, which would make
 // the second variant worse than useless. spec/plate-image.test.ts pins these
 // two numbers against styles.css so they cannot drift apart in silence.
-const DISPLAY_SIZES = "(width >= 720px) 200px, 240px";
+// Exported because the frame sequences sit in this same slot at this same
+// size, and two copies of these numbers is exactly how they drift apart.
+export const DISPLAY_SIZES = "(width >= 720px) 200px, 240px";
 
 interface Evidence {
   alt: string;

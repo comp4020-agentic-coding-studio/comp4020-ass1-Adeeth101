@@ -114,6 +114,13 @@ html {
   .plate-detail {
     opacity: 1;
   }
+
+  /* The required static fallback: the sequence goes, the plate's own still
+     shows through underneath it, and the plate is readable rather than
+     broken. */
+  .plate-frames {
+    display: none;
+  }
 }
 
 /* --bg-now is written by main.ts from the interpolated age under the reader
@@ -511,6 +518,10 @@ nav[aria-label="Chapters"] {
 .plate-figure {
   margin: 0;
 
+  /* The containing block for .plate-frames, which stacks over the still in
+     this same slot. */
+  position: relative;
+
   /* THE BLEND, and the one part of this that is easy to get subtly wrong.
 
      Generated stills carry a pure #000000 backdrop because image models do not
@@ -607,6 +618,36 @@ nav[aria-label="Chapters"] {
   .plate-title {
     font-size: 28px;
   }
+}
+
+/* The in-tile frame sequence. Stacked over the plate's still inside the same
+   figure — deliberately not full-bleed and not a background layer, because the
+   sequence is the plate's picture, not decoration behind the page. The still
+   underneath is the one described image; this container is aria-hidden.
+   Removing it under prefers-reduced-motion is what leaves a single static
+   frame showing, with no JavaScript branch to get wrong. */
+.plate-frames {
+  position: absolute;
+
+  /* Covers the still exactly, not the whole figure: the figure is taller than
+     its image because it also holds the evidence tag, and `inset: 0` put the
+     sequence over the caption. */
+  top: 0;
+  left: 0;
+  right: 0;
+  aspect-ratio: 1;
+}
+
+.plate-frames-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: screen;
+
+  /* No transition, deliberately. Easing the swap would make the animal appear
+     to accelerate on its own, which reads as playback rather than as the
+     reader driving it. spec/plate-frames.test.ts asserts this stays absent. */
 }
 
 /* The collapse. grid-template-rows 0fr -> 1fr rather than max-height, because

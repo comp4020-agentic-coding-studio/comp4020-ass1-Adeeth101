@@ -13,8 +13,14 @@ import { createLineage } from "./src/lineage-state";
 import { backgroundCssAt } from "./src/era-palette";
 import { markersFor, spacerHeightsVh } from "./src/pacing";
 import { eraFor, formatAge, plateFacts, romanNumeral } from "./src/plate-format";
-import { plateImage, type PlateImageSource } from "./src/plate-image";
+import { DISPLAY_SIZES, plateImage, type PlateImageSource } from "./src/plate-image";
 import { plateExpanded } from "./src/plate-detail";
+import {
+  FRAME_SEQUENCES,
+  frameFileStem,
+  frameIndexAt,
+  sequenceProgress,
+} from "./src/plate-frames";
 
 // Assets are discovered by filename, not listed in code: images/plates/<node
 // id>-<width>.<ext>, or <node id>.<ext> for a single-variant file. Dropping
@@ -33,6 +39,22 @@ const PLATE_ASSET_MODULES = import.meta.glob<string>("./images/plates/*.{webp,pn
   query: "?url",
   import: "default",
 });
+
+// Frame sequences live under images/frames/<node id>/f###-<width>.webp and are
+// globbed separately from the stills, so a sequence can never be mistaken for a
+// plate's still by the <node id>-<width> parser above.
+const FRAME_ASSET_MODULES = import.meta.glob<string>("./images/frames/*/*.webp", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+
+const FRAME_ASSETS = new Map<string, string>(
+  Object.entries(FRAME_ASSET_MODULES).map(([path, url]) => {
+    const parts = path.split("/");
+    return [`${parts[parts.length - 2]}/${parts[parts.length - 1].replace(".webp", "")}`, url];
+  }),
+);
 
 const PLATE_ASSETS = new Map<string, PlateImageSource[]>();
 for (const [path, url] of Object.entries(PLATE_ASSET_MODULES)) {
@@ -181,6 +203,16 @@ const rows: HTMLElement[] = [];
 const diagrams: HTMLElement[] = [];
 const applyDetails: Array<() => void> = [];
 
+interface MountedSequence {
+  row: HTMLElement | null;
+  frames: HTMLElement;
+  img: HTMLImageElement;
+  id: string;
+  count: number;
+  shown?: number;
+}
+const sequences: MountedSequence[] = [];
+
 for (const [index, node] of LINEAGE.entries()) {
   const num = document.createElement("p");
   num.className = "plate-num";
@@ -246,7 +278,24 @@ for (const [index, node] of LINEAGE.entries()) {
   // placed to its right by grid on desktop rather than by reordering. When
   // there is no asset, nothing is appended and .plate-in never gets the
   // two-column template — the plate closes up instead of leaving a hole.
-  const image = plateImage(node, index, PLATE_ASSETS.get(node.id) ?? []);
+  // A plate with a frame sequence takes its still from the sequence's first
+  // frame rather than from images/plates. Two reasons, both correctness rather
+  // than tidiness: that frame is what the reader actually sees before scrolling
+  // and under prefers-reduced-motion, so it is the honest thing to describe;
+  // and it is a real generated image, so plateImage gives it the node's
+  // evidence tag. Left as-is, Homo would have shown an AI-generated morph under
+  // a caption reading "Illustration · not a reconstruction", inherited from the
+  // schematic stand-in it used to have.
+  const firstFrame = FRAME_SEQUENCES[node.id] === undefined ? null : frameFileStem(0);
+  const stillSources: PlateImageSource[] =
+    firstFrame === null
+      ? (PLATE_ASSETS.get(node.id) ?? [])
+      : [256, 512].flatMap((width) => {
+          const url = FRAME_ASSETS.get(`${node.id}/${firstFrame}-${width}`);
+          return url === undefined ? [] : [{ url, width, format: "webp" }];
+        });
+
+  const image = plateImage(node, index, stillSources);
   if (image !== null) {
     const img = document.createElement("img");
     img.className = "plate-figure-img";
@@ -268,6 +317,31 @@ for (const [index, node] of LINEAGE.entries()) {
     const figure = document.createElement("figure");
     figure.className = "plate-figure";
     figure.append(img, tag);
+
+    // The frame sequence sits in this same slot, stacked over the still —
+    // not full-bleed, not a background layer. It is decorative: aria-hidden,
+    // so the plate keeps exactly one described image, the <img> above, with
+    // the alt and evidence tag src/plate-image.ts already gave it. Under
+    // prefers-reduced-motion CSS hides this container and the still shows
+    // through, which is the required static fallback with no JS branch.
+    const sequence = FRAME_SEQUENCES[node.id];
+    if (sequence !== undefined) {
+      const frameImg = document.createElement("img");
+      frameImg.className = "plate-frames-img";
+      frameImg.decoding = "async";
+      frameImg.alt = "";
+      frameImg.width = 512;
+      frameImg.height = 512;
+
+      const frames = document.createElement("div");
+      frames.className = "plate-frames";
+      frames.setAttribute("aria-hidden", "true");
+      frames.append(frameImg);
+      figure.insertBefore(frames, tag);
+
+      sequences.push({ row: null, frames, img: frameImg, id: node.id, count: sequence.frames });
+    }
+
     plateIn.append(figure);
   }
 
@@ -316,6 +390,10 @@ for (const [index, node] of LINEAGE.entries()) {
     applyDetail();
   });
   applyDetails.push(applyDetail);
+
+  for (const seq of sequences) {
+    if (seq.row === null && seq.id === node.id) seq.row = row;
+  }
 
   lineageEl.append(row);
   const spacer = spacerAfter(index);
@@ -480,6 +558,38 @@ function updateGauge(): void {
   if (background !== lastBackground) {
     lastBackground = background;
     document.documentElement.style.setProperty("--bg-now", background);
+  }
+
+  updateSequences();
+}
+
+// Rides updateGauge's scroll listener rather than registering its own: the
+// page already has exactly one, and a second doing the same rect reads on the
+// same events would be pure cost. spec/plate-frames.test.ts asserts the count
+// stays at one.
+function updateSequences(): void {
+  const viewportHeight = window.innerHeight;
+  for (const seq of sequences) {
+    if (seq.row === null) continue;
+    const rect = seq.row.getBoundingClientRect();
+    // Off-screen by more than a viewport: nothing to show, and no reason to
+    // fetch frames for a plate the reader may never reach.
+    if (rect.bottom < -viewportHeight || rect.top > viewportHeight * 2) continue;
+
+    const index = frameIndexAt(
+      sequenceProgress(rect.top, rect.height, viewportHeight),
+      seq.count,
+    );
+    if (index === seq.shown) continue;
+    seq.shown = index;
+
+    const stem = frameFileStem(index);
+    const small = FRAME_ASSETS.get(`${seq.id}/${stem}-256`);
+    const large = FRAME_ASSETS.get(`${seq.id}/${stem}-512`);
+    if (small === undefined || large === undefined) continue;
+    seq.img.src = small;
+    seq.img.srcset = `${small} 256w, ${large} 512w`;
+    seq.img.sizes = DISPLAY_SIZES;
   }
 }
 window.addEventListener("scroll", updateGauge, { passive: true });
