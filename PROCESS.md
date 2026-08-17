@@ -47,6 +47,15 @@ How I knew it was right: The hex values I used initially passed against the dark
 
 Citation: [`18c268b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Adeeth101/commit/18c268b)
 
+## Empirical rejection of log10 scaling in favor of power law
+
+What happened: Cramming events on a logarithmic timeline yielded a 5:1 screen-space ratio for significant epochs. Clustering of recent events resulted in the merging of notable evolutionary landmarks into an indistinguishable stack.
+
+What I did instead: I developed the log10 model (f8619f8) and added it to the timeline (7c4804d). I measured the placement and found a 5:1 ratio to be unacceptable. I replaced it with a normalized power law model (aff066e) after 26 minutes. Instead of manually removing the log10 model, I decided to keep it in DESIGN.md (df9349f) to give a reason for the power law exponent.
+
+How I knew it was right: A power law distribution yielded a 43.7:1 ratio that both scaled recent events of the evolution of mammals and preserved deep geological time. The working log10 model provided an empirical basis to substantiate the final mathematical model.
+
+Citation: f8619f8, 7c4804d, aff066e, df9349f
 
 ## Before you ship
 
