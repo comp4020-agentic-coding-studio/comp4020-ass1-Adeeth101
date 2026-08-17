@@ -1,0 +1,7 @@
+# 1. What was the breakthrough that moved the work forward?
+
+The breakthrough was learning to stop worrying about outputs and focus on fortifying the harness.[cite: 1, 3] The first time it happened, I found out that CSS variable was silently ignored because of a broken contract between files, or that an AI model created a full body for a species that was only known by its jaw bone. The broken contract lead to a broken CSS file, and the AI created a full body based on a drawing. I realised, at that moment, that the actual solution wasn't just a simple case of a manual tweak. The true step forward came when I added a test or a hard stop rule to CLAUDE.md to capture that failure class.[cite: 1, 3]Gradually, I moved rules from CLAUDE.md into the test suite. This means dynamically parsing style.css tokens with automated contrast checks. The environment started to take care of quality on its own.
+
+
+# 2. What did this work change about who I want to be as a software developer?
+This work has made me realise I want to be a 'system certifier' rather than a 'code writer' - not in the sense that I have to memorise a bunch of rules and do tons of manual assessment, rather, that I want to write tests and build systems that prove my assumptions accurately. This may even mean automating the prompt block verification that takes 27 steps. It may even mean that a certain styling property is consumed through automated code checks or that it is impossible to perform an action to reach the output that breaks the system.

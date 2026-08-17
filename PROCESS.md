@@ -1,9 +1,5 @@
 # Process overview
 
-<!-- TEMPLATE: this file is a shape to fill in, not a form. Replace everything
-     in it with your own overview, and delete this comment — `pnpm
-     check:evidence` will remind you if it's still here. -->
-
 A reading-guide to how the work came together --- a map to your process, not an
 essay about it. Markers read this file and follow its citations; they don't
 trawl the repo for evidence you didn't point at, so if a moment mattered, cite
@@ -17,60 +13,40 @@ cover every deliverable.
 
 ## What I built
 
-One paragraph: the thing, and the idea behind it.
+“One Unbroken Line” is an interactive, scroll -based explainer of the human journey through ancestry from the hypothetical last universal common ancestor (LUCA) to the user. The design focuses on a single concept, a human lineage, and shows branches of the human lineage leaving, while concentrating on disciple of the scope and not showing or following the branches.
 
 ## The moments that mattered
 
-Three or four for an assignment; fewer is fine for a weekly prototype. Keep the
-list short so each moment has room to do all four jobs:
+### A sensor for dead custom properties
 
-1. **what happened** --- the problem, or the thing the agent got wrong
-2. **what you did instead of the obvious thing** --- the call you made, and why
-   it beat the obvious one
-3. **how you knew it was right** --- the check you ran, the viewport you looked
-   at, what you read before accepting the diff
-4. **the citation** --- a commit or commit range, a `CLAUDE.md` change, a check
-   that went from red to green, a prompt paired with the commit it produced
+What happened: The scroll pacing logic set a --weight custom property in main.ts for every row, and none of the rules in styles.css read it. The build had no issues and the feature continued to operate invisibly.
 
-Jobs 2 and 3 are the ones the repo can't tell a reader on its own, so they're
-where the marks are. The strongest moments are the ones where a correction
-landed in the **harness** rather than in another prompt --- a rule added to
-`CLAUDE.md`, a check wired up, an attempt thrown away: re-prompting until it
-passes is the routine case, and changing what the agent works against is the
-skilled one.
+What I did instead: Rather than just wiring up the CSS, I created a custom test harness sensor in main.ts that checks if each setProperty() is read in styles.css.
 
-Cite each moment as a link whose text is the commit hash or range and whose
-target is this repo's commit or compare URL, so a reader clicks straight to the
-evidence:
+How I knew it was right: I re-introduced a dead property in the TypeScript file, and watched the test fail with the property name in the error message. A green sensor that has never been seen red is not evidence.
 
-- one commit: [`a1b2c3d`](https://github.com/YOUR-ORG/YOUR-REPO/commit/a1b2c3d)
-- a range:
-  [`a1b2c3d...e4f5a6b`](https://github.com/YOUR-ORG/YOUR-REPO/compare/a1b2c3d...e4f5a6b)
+Citation: [`132617d`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Adeeth101/commit/132617d)
 
-To pair a prompt with the commit it produced, quote the prompt (curated, not a
-full transcript) next to the citation:
+### A date is not a node
 
-> the prompt, verbatim
+What happened: The dataset contained a correct molecular clock date (80.7 Ma) that was attached to the wrong node (crown Primates, rather than the origin of Euarchontoglires).
 
-Screenshots are welcome where one carries the verification better than a
-sentence does. Commit the file to this repo and link it with a **relative**
-path, which is what makes it render on GitHub: `![alt text](docs/before.png)`.
-Images don't count towards the word count and don't replace the citation.
+What I did instead: Rather than just correcting the node's data, I added a strict harness rule to CLAUDE.md: "A date is not a node". The rule requires verifying paper scope, node identity, and branch cousins separately before accepting any date.
 
-### A worked moment, for shape
+How I knew it was right: I added an arithmetic check requiring that a divergence cannot be younger than the fossils on both sides of it. This check successfully caught a separate, impossible 40 Ma date for Simiiformes.
 
-Delete this section along with the rest of the boilerplate --- it's here to show
-the four jobs in one paragraph, not to be imitated in content.
+Citation: [`4723051`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Adeeth101/commit/4723051)
 
-> The date formatter kept coming back with `toLocaleDateString()` and no locale
-> argument, so the same build rendered differently on my machine and in CI. I'd
-> already re-prompted it twice, which fixed the line but not the habit, so the
-> third time I put the rule in `CLAUDE.md` instead
-> ([`3f9ac21`](https://github.com/YOUR-ORG/YOUR-REPO/commit/3f9ac21)) and added
-> a spec test that fails on a bare `toLocaleDateString`. That's what told me it
-> had actually taken: the test went red against the old code and green against
-> the new, and the next two features it wrote passed it without prompting
-> ([`3f9ac21...b7e0d14`](https://github.com/YOUR-ORG/YOUR-REPO/compare/3f9ac21...b7e0d14)).
+### Contrast being a constraint
+
+What happened: When #6B6862 was used for the --text-3 token, the contracts failed WCAG AA across the era grounds (measuring 3.14–3.27:1 vs 4.5:1). To address it, I had to increase color contrast for --text-3 and balance it against the different levels of importance within the text.
+
+What I did instead: Rather than trying to pick hex values on my own, I used a script to read styles.css and conducted a 421-point test to check --text-3 for every interpolated era background and active plate surface. I automated the test to stop the build in case the contrast went below 4.5:1.
+
+How I knew it was right: The hex values I used initially passed against the darker backgrounds, but with the 421-point sweep I uncovered a failure case that I missed before. With the automated test I was forced to use #595651 to make the active plate surface (--surface) the contracting element rather than the earth/background.
+
+Citation: [`18c268b`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Adeeth101/commit/18c268b)
+
 
 ## Before you ship
 
