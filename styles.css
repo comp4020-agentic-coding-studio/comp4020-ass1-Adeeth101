@@ -106,6 +106,14 @@ html {
   html {
     scroll-behavior: auto;
   }
+
+  /* The collapse still collapses, it just doesn't animate: the 1ms above keeps
+     transitionend firing, so the gauge anchors are still recomputed. Opacity is
+     pinned open so no plate can be left half-faded by a transition that had no
+     time to run. */
+  .plate-detail {
+    opacity: 1;
+  }
 }
 
 /* --bg-now is written by main.ts from the interpolated age under the reader
@@ -599,6 +607,30 @@ nav[aria-label="Chapters"] {
   .plate-title {
     font-size: 28px;
   }
+}
+
+/* The collapse. grid-template-rows 0fr -> 1fr rather than max-height, because
+   1fr resolves to the content's real height: no plate can be clipped by a
+   ceiling guessed too low, and none animates against a ceiling guessed too
+   high. The rule for *when* this is open lives in src/plate-detail.ts; this
+   only draws it. main.ts listens for the end of this transition to recompute
+   the depth gauge's anchors, since every plate here changes height. */
+.plate-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--dur) var(--ease),
+    opacity var(--dur) var(--ease);
+}
+
+.plate-detail[data-expanded="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.plate-detail-in {
+  overflow: hidden;
 }
 
 .plate-sub {

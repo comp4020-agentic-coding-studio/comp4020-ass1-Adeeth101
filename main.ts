@@ -14,6 +14,7 @@ import { backgroundCssAt } from "./src/era-palette";
 import { markersFor, spacerHeightsVh } from "./src/pacing";
 import { eraFor, formatAge, plateFacts, romanNumeral } from "./src/plate-format";
 import { plateImage, type PlateImageSource } from "./src/plate-image";
+import { plateExpanded } from "./src/plate-detail";
 
 // Assets are discovered by filename, not listed in code: images/plates/<node
 // id>-<width>.<ext>, or <node id>.<ext> for a single-variant file. Dropping
@@ -178,6 +179,7 @@ lineageEl.append(trunkElement());
 const plates: HTMLElement[] = [];
 const rows: HTMLElement[] = [];
 const diagrams: HTMLElement[] = [];
+const applyDetails: Array<() => void> = [];
 
 for (const [index, node] of LINEAGE.entries()) {
   const num = document.createElement("p");
@@ -212,16 +214,28 @@ for (const [index, node] of LINEAGE.entries()) {
   capText.textContent = node.source;
   cap.append(capLabel, capText);
 
-  const text = document.createElement("div");
-  text.className = "plate-text";
-  text.append(num, title);
+  // Everything that is an argument rather than an identity goes inside the
+  // collapsible wrapper: the cousins, the traits, the source. The number, the
+  // name and the age stay out of it, because those are what a collapsed plate
+  // still has to be able to say. See src/plate-detail.ts.
+  const detailIn = document.createElement("div");
+  detailIn.className = "plate-detail-in";
   if (node.branch.trim() !== "") {
     const sub = document.createElement("p");
     sub.className = "plate-sub";
     sub.textContent = `Leaving here, your cousins: ${node.branch}`;
-    text.append(sub);
+    detailIn.append(sub);
   }
-  text.append(body, cap);
+  detailIn.append(body, cap);
+
+  const detail = document.createElement("div");
+  detail.className = "plate-detail";
+  detail.dataset.expanded = "false";
+  detail.append(detailIn);
+
+  const text = document.createElement("div");
+  text.className = "plate-text";
+  text.append(num, title, detail);
 
   const plateIn = document.createElement("div");
   plateIn.className = "plate-in";
@@ -275,6 +289,34 @@ for (const [index, node] of LINEAGE.entries()) {
   row.className = "node-row";
   row.append(plate, diagram);
 
+  // Hover and focus are tracked as state rather than left to CSS, so that
+  // plateExpanded stays the single rule and the transition has one attribute
+  // to fire on. focusin/focusout rather than focus/blur: they bubble, so a
+  // focus landing anywhere inside the plate counts.
+  const hoverFocus = { isHovered: false, isFocused: false };
+  const applyDetail = (): void => {
+    detail.dataset.expanded = String(
+      plateExpanded({ isCurrent: plate.classList.contains("plate-on"), ...hoverFocus }),
+    );
+  };
+  plate.addEventListener("pointerenter", () => {
+    hoverFocus.isHovered = true;
+    applyDetail();
+  });
+  plate.addEventListener("pointerleave", () => {
+    hoverFocus.isHovered = false;
+    applyDetail();
+  });
+  plate.addEventListener("focusin", () => {
+    hoverFocus.isFocused = true;
+    applyDetail();
+  });
+  plate.addEventListener("focusout", () => {
+    hoverFocus.isFocused = false;
+    applyDetail();
+  });
+  applyDetails.push(applyDetail);
+
   lineageEl.append(row);
   const spacer = spacerAfter(index);
   if (spacer !== null) lineageEl.append(spacer);
@@ -304,6 +346,7 @@ function renderCurrent(shouldFocus: boolean): void {
       plate.removeAttribute("aria-current");
     }
   }
+  for (const applyDetail of applyDetails) applyDetail();
   const node = LINEAGE[index];
   const ageText = node.age > 0 ? `~${formatAge(node.age)} ago` : "now";
   gaugePlateNumEl.textContent = romanNumeral(index + 1);
@@ -392,6 +435,17 @@ function recomputeAnchors(): void {
 }
 recomputeAnchors();
 window.addEventListener("resize", recomputeAnchors);
+
+// A collapsing plate changes its own height, which moves every anchor below it
+// and would leave the depth gauge reporting an era the reader is no longer in.
+// The listener is on #lineage rather than on each plate so it costs one
+// registration, and it filters on the property because .plate-detail is not
+// the only thing on the page that transitions.
+lineageEl.addEventListener("transitionend", (event) => {
+  if ((event as TransitionEvent).propertyName !== "grid-template-rows") return;
+  recomputeAnchors();
+  updateGauge();
+});
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
