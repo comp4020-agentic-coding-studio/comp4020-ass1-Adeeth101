@@ -392,6 +392,30 @@ nav[aria-label="Chapters"] {
   }
 }
 
+/* The scroll runway for a plate carrying a frame sequence. The row inside it
+   pins while the reader scrolls the runway past, which is what gives the morph
+   room to read as motion: without it the sequence played out over 1,016px of a
+   73,000px page, one frame every 20px, and was over before it registered.
+   Wrapping the row rather than restyling it leaves the plate's own flex layout
+   and the branch diagram beside it completely untouched.
+
+   Declared after .node-row deliberately: stylelint's no-descending-specificity
+   rejects the reverse order.
+
+   Height and offset are duplicated from src/plate-frames.ts, which is the
+   source of truth for the frame arithmetic; spec/plate-frames.test.ts asserts
+   the two agree, because a mismatch would desynchronise the morph from the pin
+   without breaking anything visibly. */
+.node-runway {
+  position: relative;
+  min-height: 320vh;
+}
+
+.node-runway > .node-row {
+  position: sticky;
+  top: 10vh;
+}
+
 /* ---- Time-scaled pacing (docs/DESIGN.md §4) ---- */
 
 /* The elapsed time between two plates, as empty scroll distance. `--gap` is

@@ -19,7 +19,9 @@ import {
   FRAME_SEQUENCES,
   frameFileStem,
   frameIndexAt,
-  sequenceProgress,
+  runwayProgress,
+  RUNWAY_STICKY_VH,
+  RUNWAY_VH,
 } from "./src/plate-frames";
 
 // Assets are discovered by filename, not listed in code: images/plates/<node
@@ -204,6 +206,10 @@ const diagrams: HTMLElement[] = [];
 const applyDetails: Array<() => void> = [];
 
 interface MountedSequence {
+  // The runway is what stays put while the row pins to it, so it is the
+  // element whose rect gives scroll progress. The row is only needed for its
+  // height, which sets where the pin ends.
+  runway: HTMLElement | null;
   row: HTMLElement | null;
   frames: HTMLElement;
   img: HTMLImageElement;
@@ -286,12 +292,19 @@ for (const [index, node] of LINEAGE.entries()) {
   // evidence tag. Left as-is, Homo would have shown an AI-generated morph under
   // a caption reading "Illustration · not a reconstruction", inherited from the
   // schematic stand-in it used to have.
-  const firstFrame = FRAME_SEQUENCES[node.id] === undefined ? null : frameFileStem(0);
+  // The LAST frame, not the first. This plate is about what the animal became:
+  // frame one of the tetrapod sequence is a lobe-finned fish, and shipping it
+  // put that fish on the plate titled "The first tetrapod". It is also the only
+  // thing a reader with prefers-reduced-motion ever sees, because CSS removes
+  // the sequence for them — so the still has to be the outcome, not the start.
+  const sequenceForStill = FRAME_SEQUENCES[node.id];
+  const stillFrame =
+    sequenceForStill === undefined ? null : frameFileStem(sequenceForStill.frames - 1);
   const stillSources: PlateImageSource[] =
-    firstFrame === null
+    stillFrame === null
       ? (PLATE_ASSETS.get(node.id) ?? [])
       : [256, 512].flatMap((width) => {
-          const url = FRAME_ASSETS.get(`${node.id}/${firstFrame}-${width}`);
+          const url = FRAME_ASSETS.get(`${node.id}/${stillFrame}-${width}`);
           return url === undefined ? [] : [{ url, width, format: "webp" }];
         });
 
@@ -339,7 +352,14 @@ for (const [index, node] of LINEAGE.entries()) {
       frames.append(frameImg);
       figure.insertBefore(frames, tag);
 
-      sequences.push({ row: null, frames, img: frameImg, id: node.id, count: sequence.frames });
+      sequences.push({
+        runway: null,
+        row: null,
+        frames,
+        img: frameImg,
+        id: node.id,
+        count: sequence.frames,
+      });
     }
 
     plateIn.append(figure);
@@ -391,15 +411,31 @@ for (const [index, node] of LINEAGE.entries()) {
   });
   applyDetails.push(applyDetail);
 
-  for (const seq of sequences) {
-    if (seq.row === null && seq.id === node.id) seq.row = row;
+  // A plate carrying a frame sequence gets a scroll runway: the row pins while
+  // the reader scrolls through it, which is what gives the morph room to read
+  // as motion. Without it the sequence was driven by the row's own traverse of
+  // the viewport — 1,016px on a 73,000px page, one frame every 20px, over
+  // before it registered. The runway wraps the row rather than restyling it, so
+  // the plate's own layout and the branch diagram beside it are untouched.
+  let outer: HTMLElement = row;
+  if (FRAME_SEQUENCES[node.id] !== undefined) {
+    const runway = document.createElement("div");
+    runway.className = "node-runway";
+    runway.append(row);
+    outer = runway;
+    for (const seq of sequences) {
+      if (seq.runway === null && seq.id === node.id) {
+        seq.runway = runway;
+        seq.row = row;
+      }
+    }
   }
 
-  lineageEl.append(row);
+  lineageEl.append(outer);
   const spacer = spacerAfter(index);
   if (spacer !== null) lineageEl.append(spacer);
   plates.push(plate);
-  rows.push(row);
+  rows.push(outer);
   diagrams.push(diagram);
 
   const li = document.createElement("li");
@@ -508,7 +544,14 @@ let anchors: number[] = [];
 function recomputeAnchors(): void {
   anchors = rows.map((row) => {
     const rect = row.getBoundingClientRect();
-    return rect.top + window.scrollY + rect.height / 2;
+    // Half the row's height, or half a viewport if the row is taller than one.
+    // Identical to rect.height / 2 for every ordinary row, which are all far
+    // shorter than the viewport — but a sequence plate's scroll runway is over
+    // three viewports tall, and anchoring at ITS midpoint would put the node's
+    // marker a viewport and a half below the plate the reader is looking at,
+    // so the depth gauge would name the wrong era while the plate is pinned.
+    const readable = Math.min(rect.height, window.innerHeight);
+    return rect.top + window.scrollY + readable / 2;
   });
 }
 recomputeAnchors();
@@ -569,15 +612,16 @@ function updateGauge(): void {
 // stays at one.
 function updateSequences(): void {
   const viewportHeight = window.innerHeight;
+  const stickyOffset = (viewportHeight * RUNWAY_STICKY_VH) / 100;
   for (const seq of sequences) {
-    if (seq.row === null) continue;
-    const rect = seq.row.getBoundingClientRect();
+    if (seq.runway === null || seq.row === null) continue;
+    const rect = seq.runway.getBoundingClientRect();
     // Off-screen by more than a viewport: nothing to show, and no reason to
     // fetch frames for a plate the reader may never reach.
     if (rect.bottom < -viewportHeight || rect.top > viewportHeight * 2) continue;
 
     const index = frameIndexAt(
-      sequenceProgress(rect.top, rect.height, viewportHeight),
+      runwayProgress(rect.top, rect.height, seq.row.offsetHeight, stickyOffset),
       seq.count,
     );
     if (index === seq.shown) continue;

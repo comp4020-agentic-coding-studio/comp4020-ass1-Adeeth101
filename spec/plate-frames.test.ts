@@ -7,31 +7,62 @@ import {
   FRAME_SEQUENCES,
   frameFileStem,
   frameIndexAt,
-  sequenceProgress,
+  runwayProgress,
+  RUNWAY_STICKY_VH,
+  RUNWAY_VH,
 } from "../src/plate-frames";
 
 // Written before the sequences existed, and observed failing first.
 
-describe("sequenceProgress", () => {
-  it("is 0 before the row has entered and 1 once it has fully left", () => {
-    expect(sequenceProgress(800, 400, 800)).toBe(0);
-    expect(sequenceProgress(-400, 400, 800)).toBe(1);
+// The runway replaces the first version's sequenceProgress, which drove the
+// morph from the row's own traverse of the viewport. That measured 1,016px on a
+// 73,000px page — one frame every 20px — so the sequence was over before it read
+// as motion, and on a page this long a reader could pass it without noticing it
+// moved. Recorded here rather than dropped silently.
+describe("runwayProgress", () => {
+  // 320vh runway, 10vh sticky offset, a ~300px plate, at a 800px viewport.
+  const RUNWAY = 2560;
+  const ROW = 300;
+  const STICKY = 80;
+  const at = (top: number) => runwayProgress(top, RUNWAY, ROW, STICKY);
+
+  it("is 0 until the plate has actually pinned", () => {
+    expect(at(800)).toBe(0);
+    expect(at(STICKY)).toBe(0);
   });
 
-  it("clamps rather than running past either end", () => {
-    expect(sequenceProgress(5000, 400, 800)).toBe(0);
-    expect(sequenceProgress(-5000, 400, 800)).toBe(1);
+  it("is 1 once the plate is about to unpin, not once the runway has fully left", () => {
+    // The pin ends when the runway's bottom reaches the plate's bottom. Driving
+    // progress off the runway's full height instead would run the last frames
+    // after the plate had unpinned and started scrolling away — the end of the
+    // morph would happen off-screen.
+    expect(at(STICKY - (RUNWAY - ROW))).toBe(1);
   });
 
-  it("rises monotonically as the row travels up the viewport", () => {
-    const seen = [800, 600, 400, 200, 0, -200, -400].map((top) =>
-      sequenceProgress(top, 400, 800),
-    );
+  it("clamps at both ends rather than running past them", () => {
+    expect(at(99999)).toBe(0);
+    expect(at(-99999)).toBe(1);
+  });
+
+  it("rises monotonically through the pinned stretch", () => {
+    const seen = [80, 0, -400, -900, -1400, -1900, -2260].map(at);
     for (let i = 1; i < seen.length; i++) expect(seen[i]).toBeGreaterThan(seen[i - 1]);
   });
 
-  it("survives a zero-height viewport without dividing by zero", () => {
-    expect(Number.isFinite(sequenceProgress(0, 0, 0))).toBe(true);
+  it("reaches the halfway frame halfway through the pin", () => {
+    expect(at(STICKY - (RUNWAY - ROW) / 2)).toBeCloseTo(0.5, 5);
+  });
+
+  it("does not divide by zero when the runway is shorter than the plate", () => {
+    expect(runwayProgress(0, 100, 300, 0)).toBe(0);
+  });
+
+  it("gives the morph enough scroll to read as motion", () => {
+    // The failure this exists to prevent: 52 frames over 1,016px, which is what
+    // shipped first. At a 800px viewport the runway must leave well over 20px
+    // of scroll per frame.
+    const travel = RUNWAY - ROW;
+    expect(travel / 52).toBeGreaterThan(30);
   });
 });
 
@@ -124,6 +155,27 @@ describe("the frame sequence's wiring contract", () => {
 
   it("hides the sequence from assistive tech, leaving one described image", () => {
     expect(main).toMatch(/plate-frames[\s\S]{0,300}aria-hidden/);
+  });
+
+  it("keeps the stylesheet's runway geometry in step with the frame arithmetic", () => {
+    // These numbers live in two files: src/plate-frames.ts does the frame
+    // arithmetic, styles.css does the pinning. If they drift, the morph
+    // desynchronises from the pin and nothing looks obviously broken.
+    const runway = css.match(/\.node-runway\s*\{[^}]*\}/)?.[0] ?? "";
+    const pin = css.match(/\.node-runway > \.node-row\s*\{[^}]*\}/)?.[0] ?? "";
+    expect(runway).toContain(`min-height: ${RUNWAY_VH}vh`);
+    expect(pin).toContain(`top: ${RUNWAY_STICKY_VH}vh`);
+  });
+
+  it("pins the plate rather than restyling it, so the row's own layout is untouched", () => {
+    expect(css).toMatch(/\.node-runway > \.node-row\s*\{[^}]*position:\s*sticky/);
+  });
+
+  it("shows the sequence's LAST frame as the still, not its first", () => {
+    // Frame one of the tetrapod sequence is a lobe-finned fish, and the plate is
+    // titled "The first tetrapod". It is also the only frame a reader with
+    // prefers-reduced-motion ever sees.
+    expect(main).toMatch(/frameFileStem\(\s*sequenceForStill\.frames - 1\s*\)/);
   });
 
   it("falls back to a single static frame under prefers-reduced-motion", () => {
