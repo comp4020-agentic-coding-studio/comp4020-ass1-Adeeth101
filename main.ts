@@ -378,24 +378,29 @@ for (const [index, node] of LINEAGE.entries()) {
     figure.className = "plate-figure";
     figure.append(img, tag);
 
-    // The frame sequence sits in this same slot, stacked over the still —
-    // not full-bleed, not a background layer. It is decorative: aria-hidden,
-    // so the plate keeps exactly one described image, the <img> above, with
-    // the alt and evidence tag src/plate-image.ts already gave it. Under
-    // prefers-reduced-motion CSS hides this container and the still shows
-    // through, which is the required static fallback with no JS branch.
+    // The frame sequence and the still are ALTERNATIVES, not layers. CSS
+    // renders exactly one of them: the sequence when motion is allowed, the
+    // still under prefers-reduced-motion. They were stacked once, and both
+    // drew at the same time and screen-blended into each other.
+    //
+    // Because only one is in the document at a time, whichever one that is has
+    // to be the described image — hiding the still with display:none takes it
+    // out of the accessibility tree along with its alt text. So the sequence's
+    // img carries the same alt and the container is not aria-hidden. That is
+    // still one described image per plate, which is what CLAUDE.md's media rule
+    // is protecting: 52 frames must not become 52 alt texts, and here they are
+    // one <img> whose src changes.
     const sequence = FRAME_SEQUENCES[node.id];
     if (sequence !== undefined) {
       const frameImg = document.createElement("img");
       frameImg.className = "plate-frames-img";
       frameImg.decoding = "async";
-      frameImg.alt = "";
+      frameImg.alt = image.alt;
       frameImg.width = 512;
       frameImg.height = 512;
 
       const frames = document.createElement("div");
       frames.className = "plate-frames";
-      frames.setAttribute("aria-hidden", "true");
       frames.append(frameImg);
       figure.insertBefore(frames, tag);
 

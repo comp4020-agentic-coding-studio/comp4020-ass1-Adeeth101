@@ -153,8 +153,26 @@ describe("the frame sequence's wiring contract", () => {
     expect(main).toMatch(/function updateGauge[\s\S]{0,1600}updateSequences\(\)/);
   });
 
-  it("hides the sequence from assistive tech, leaving one described image", () => {
-    expect(main).toMatch(/plate-frames[\s\S]{0,300}aria-hidden/);
+  it("renders exactly one picture per figure, never the sequence over the still", () => {
+    // The bug this replaces: .plate-frames was absolutely positioned over the
+    // still, so with motion allowed both drew at once and screen-blended into
+    // each other. They are alternatives.
+    const bare = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    expect(bare).toMatch(/\.plate-figure:has\(\.plate-frames\) \.plate-figure-img\s*\{[^}]*display:\s*none/);
+    const reduced = bare.slice(bare.lastIndexOf("@media (prefers-reduced-motion: reduce)"));
+    expect(reduced).toMatch(/\.plate-frames\s*\{[^}]*display:\s*none/);
+    expect(reduced).toMatch(/\.plate-figure:has\(\.plate-frames\) \.plate-figure-img\s*\{[^}]*display:\s*block/);
+    // and the sequence must be in flow, or hiding the still collapses the slot
+    const frames = bare.match(/^\.plate-frames\s*\{[^}]*\}/m)?.[0] ?? "";
+    expect(frames).not.toMatch(/position:\s*absolute/);
+  });
+
+  it("keeps one described image in whichever mode is active", () => {
+    // display:none takes the still out of the accessibility tree along with its
+    // alt, so with motion allowed the sequence's img has to carry it. One
+    // described image either way — 52 frames still do not become 52 alt texts.
+    expect(main).toMatch(/frameImg\.alt = image\.alt/);
+    expect(main).not.toMatch(/frames\.setAttribute\("aria-hidden"/);
   });
 
   it("keeps the stylesheet's runway geometry in step with the frame arithmetic", () => {

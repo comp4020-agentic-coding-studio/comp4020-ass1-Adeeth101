@@ -128,13 +128,6 @@ html {
   .plate-figure-card[data-expanded="true"] .chart-glyph {
     opacity: 0;
   }
-
-  /* The required static fallback: the sequence goes, the plate's own still
-     shows through underneath it, and the plate is readable rather than
-     broken. */
-  .plate-frames {
-    display: none;
-  }
 }
 
 /* --bg-now is written by main.ts from the interpolated age under the reader
@@ -892,15 +885,34 @@ nav[aria-label="Chapters"] {
    Removing it under prefers-reduced-motion is what leaves a single static
    frame showing, with no JavaScript branch to get wrong. */
 .plate-frames {
-  position: absolute;
-
-  /* Covers the still exactly, not the whole figure: the figure is taller than
-     its image because it also holds the evidence tag, and `inset: 0` put the
-     sequence over the caption. */
-  top: 0;
-  left: 0;
-  right: 0;
+  display: block;
+  width: 100%;
+  max-width: 240px;
   aspect-ratio: 1;
+}
+
+@media (width >= 720px) {
+  .plate-frames {
+    max-width: none;
+  }
+}
+
+/* Exactly one picture per figure, in either mode. The sequence used to be
+   absolutely positioned over the still, so with motion allowed both rendered
+   at once and screen-blended into each other. They are alternatives, not
+   layers: with motion the sequence is the picture, without it the still is. */
+.plate-figure:has(.plate-frames) .plate-figure-img {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate-frames {
+    display: none;
+  }
+
+  .plate-figure:has(.plate-frames) .plate-figure-img {
+    display: block;
+  }
 }
 
 .plate-frames-img {
