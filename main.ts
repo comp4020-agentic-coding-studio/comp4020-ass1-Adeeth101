@@ -13,6 +13,9 @@ import { createLineage } from "./src/lineage-state";
 import { backgroundCssAt } from "./src/era-palette";
 import { markersFor, spacerHeightsVh } from "./src/pacing";
 import { INTERLUDES } from "./src/data/interludes";
+import { FIGURE_PLATES } from "./src/data/figure-plates";
+import { FIGURE_SOURCES } from "./src/data/figures";
+import { extinctionChartSvg, oxygenChartSvg } from "./src/figure-svg";
 import { eraFor, formatAge, plateFacts, romanNumeral } from "./src/plate-format";
 import { DISPLAY_SIZES, plateImage, type PlateImageSource } from "./src/plate-image";
 import { plateExpanded } from "./src/plate-detail";
@@ -462,6 +465,9 @@ for (const [index, node] of LINEAGE.entries()) {
   lineageEl.append(outer);
   const spacer = spacerAfter(index);
   if (spacer !== null) lineageEl.append(spacer);
+  for (const figure of FIGURE_PLATES.filter((f) => f.after === index)) {
+    lineageEl.append(figurePlateElement(figure));
+  }
   plates.push(plate);
   rows.push(outer);
   diagrams.push(diagram);
@@ -475,6 +481,112 @@ for (const [index, node] of LINEAGE.entries()) {
 }
 
 gaugeTotalEl.textContent = romanNumeral(LINEAGE.length);
+
+// A chart plate. Deliberately built from the same parts as a lineage plate —
+// same frame, same collapse, same source line — because it is making the same
+// kind of claim and should be read with the same scepticism. It is NOT a
+// lineage node: it carries no plate number, does not enter `plates` or `rows`,
+// and the depth gauge still counts only ancestors. See src/data/figure-plates.ts.
+function figurePlateElement(figure: (typeof FIGURE_PLATES)[number]): HTMLElement {
+  const standfirst = document.createElement("p");
+  standfirst.className = "plate-num";
+  standfirst.textContent = figure.standfirst;
+
+  const title = document.createElement("h2");
+  title.className = "plate-title";
+  title.textContent = figure.title;
+
+  const chart = document.createElement("div");
+  chart.className = "plate-chart";
+  chart.innerHTML = figure.sourceKey === "oxygen" ? oxygenChartSvg() : extinctionChartSvg();
+
+  // Outside the collapse deliberately: this is the key to the marks, and the
+  // detail below it is closed until the reader asks for it.
+  const legend = document.createElement("ul");
+  legend.className = "chart-legend";
+  for (const entry of figure.legend ?? []) {
+    const item = document.createElement("li");
+    const swatch = document.createElement("span");
+    swatch.className = `chart-legend-mark is-${entry.mark}`;
+    swatch.setAttribute("aria-hidden", "true");
+    item.append(swatch, entry.text);
+    legend.append(item);
+  }
+
+  const body = document.createElement("div");
+  body.className = "plate-body";
+  for (const paragraph of figure.body) {
+    const p = document.createElement("p");
+    p.textContent = paragraph;
+    body.append(p);
+  }
+
+  const cap = document.createElement("div");
+  cap.className = "plate-cap";
+  const capLabel = document.createElement("p");
+  capLabel.className = "plate-cap-label";
+  capLabel.textContent = "Source";
+  const capText = document.createElement("p");
+  capText.className = "plate-cap-text";
+  capText.textContent = FIGURE_SOURCES[figure.sourceKey];
+  cap.append(capLabel, capText);
+
+  const detailIn = document.createElement("div");
+  detailIn.className = "plate-detail-in";
+  detailIn.append(body, cap);
+
+  const detail = document.createElement("div");
+  detail.className = "plate-detail";
+  detail.dataset.expanded = "false";
+  detail.append(detailIn);
+
+  const text = document.createElement("div");
+  text.className = "plate-text";
+  text.append(standfirst, title, chart);
+  if (legend.childElementCount > 0) text.append(legend);
+  text.append(detail);
+
+  const plateIn = document.createElement("div");
+  plateIn.className = "plate-in";
+  plateIn.append(text);
+
+  const frame = document.createElement("div");
+  frame.className = "plate-frame";
+
+  const plate = document.createElement("section");
+  plate.className = "plate plate-figure-card";
+  plate.id = figure.id;
+  plate.tabIndex = -1;
+  plate.append(frame, plateIn);
+
+  // Same rule as a lineage plate, minus `current`: a chart plate is never the
+  // current node, because it is not a node. Hover or focus opens it.
+  const hoverFocus = { isCurrent: false, isHovered: false, isFocused: false };
+  const apply = (): void => {
+    detail.dataset.expanded = String(plateExpanded(hoverFocus));
+  };
+  plate.addEventListener("pointerenter", () => {
+    hoverFocus.isHovered = true;
+    apply();
+  });
+  plate.addEventListener("pointerleave", () => {
+    hoverFocus.isHovered = false;
+    apply();
+  });
+  plate.addEventListener("focusin", () => {
+    hoverFocus.isFocused = true;
+    apply();
+  });
+  plate.addEventListener("focusout", () => {
+    hoverFocus.isFocused = false;
+    apply();
+  });
+
+  const row = document.createElement("div");
+  row.className = "node-row node-row-figure";
+  row.append(plate);
+  return row;
+}
 
 function renderCurrent(shouldFocus: boolean): void {
   const index = state.getCurrentIndex();
