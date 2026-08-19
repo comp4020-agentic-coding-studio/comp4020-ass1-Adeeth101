@@ -609,6 +609,13 @@ nav[aria-label="Chapters"] {
   opacity: 0.9;
 }
 
+/* A marker that would land inside an interlude's reserved band is not drawn.
+   There are plenty of them down a long spacer, so losing one to a note costs
+   nothing; overprinting the note costs the note. */
+.spacer-mark.is-crowded {
+  display: none;
+}
+
 /* An interlude: what was happening across a stretch of emptiness, and why it
    left nothing behind. Set at the reading measure and in the body serif, not
    the instrument condensed used by .spacer-mark above — a mark is a readout,
@@ -616,6 +623,7 @@ nav[aria-label="Chapters"] {
 
    Left-aligned into the same column as the plates rather than centred, so a
    reader coming down the trunk meets it where their eye already is. */
+
 .spacer-note {
   position: absolute;
   top: var(--at, 0);

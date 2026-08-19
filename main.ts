@@ -13,6 +13,7 @@ import { createLineage } from "./src/lineage-state";
 import { backgroundCssAt } from "./src/era-palette";
 import { markersFor, spacerHeightsVh } from "./src/pacing";
 import { INTERLUDES } from "./src/data/interludes";
+import { clashesWithNote, reservedBand } from "./src/spacer-layout";
 import { FIGURE_PLATES } from "./src/data/figure-plates";
 import { FIGURE_SOURCES } from "./src/data/figures";
 import { extinctionChartSvg, oxygenChartSvg } from "./src/figure-svg";
@@ -249,6 +250,16 @@ interface MountedSequence {
   shown?: number;
 }
 const sequences: MountedSequence[] = [];
+
+// Declared up here with the other module state, not next to the function that
+// uses it. `let` bindings are not hoisted the way function declarations are, so
+// with this sitting beside scheduleAnchorRecompute further down the file, the
+// first renderCurrent(false) -- which runs well before that point and calls
+// into every plate's applyDetail -- hit it in the temporal dead zone and threw.
+// That ReferenceError killed the rest of module evaluation silently: the plates
+// were already rendered, so the page looked fine while the scroll listener, the
+// anchor setup and the spacer reflow had all simply never been attached.
+let anchorFrame: number | undefined;
 
 for (const [index, node] of LINEAGE.entries()) {
   const num = document.createElement("p");
@@ -700,8 +711,66 @@ function recomputeAnchors(): void {
     return rect.top + window.scrollY + readable / 2;
   });
 }
+
+// The same recompute, but not waiting for a transition to end — because under
+// prefers-reduced-motion there is no transition, so no transitionend, and the
+// listener above never runs. Coalesced through one animation frame so a burst
+// of state changes (28 plates re-evaluated on every current-node change) costs
+// one layout read rather than 28.
+function scheduleAnchorRecompute(): void {
+  if (anchorFrame !== undefined) return;
+  anchorFrame = requestAnimationFrame(() => {
+    anchorFrame = undefined;
+    recomputeAnchors();
+    updateGauge();
+  });
+}
+
+// Date markers and interludes are both absolutely positioned into the same
+// spacer, at offsets from two unrelated sources, and nothing stopped one
+// landing on top of the other -- which is what happened at 701 Ma in the
+// Proterozoic gap.
+//
+// Each note reserves a band the height of its own rendered box plus clearance,
+// and any marker inside that band is not placed. The height is measured rather
+// than assumed, because the same paragraph wraps to far more lines in a 390px
+// column than in a 940px one, and because a fixed guess would be tuned to one
+// spacer's marker cadence when there are eleven different ones.
+function reflowSpacerMarks(): void {
+  const vh = window.innerHeight;
+  if (vh <= 0) return;
+  for (const spacer of lineageEl.querySelectorAll<HTMLElement>(".node-spacer")) {
+    const notes = spacer.querySelectorAll<HTMLElement>(".spacer-note");
+    if (notes.length === 0) continue;
+    const bands = [...notes].map((note) =>
+      reservedBand(
+        Number.parseFloat(note.style.getPropertyValue("--at")),
+        (note.offsetHeight / vh) * 100,
+      ),
+    );
+    for (const mark of spacer.querySelectorAll<HTMLElement>(".spacer-mark")) {
+      const at = Number.parseFloat(mark.style.getPropertyValue("--at"));
+      mark.classList.toggle("is-crowded", clashesWithNote(at, bands));
+    }
+  }
+}
+
 recomputeAnchors();
-window.addEventListener("resize", recomputeAnchors);
+reflowSpacerMarks();
+window.addEventListener("resize", () => {
+  reflowSpacerMarks();
+  recomputeAnchors();
+});
+
+// Webfonts change how the prose wraps, which changes every note's height, which
+// moves every reserved band. Without this the bands are measured against the
+// fallback font and are wrong by a line or two once Newsreader lands.
+if ("fonts" in document) {
+  void document.fonts.ready.then(() => {
+    reflowSpacerMarks();
+    recomputeAnchors();
+  });
+}
 
 // A collapsing plate changes its own height, which moves every anchor below it
 // and would leave the depth gauge reporting an era the reader is no longer in.
@@ -713,21 +782,6 @@ lineageEl.addEventListener("transitionend", (event) => {
   recomputeAnchors();
   updateGauge();
 });
-
-// The same recompute, but not waiting for a transition to end — because under
-// prefers-reduced-motion there is no transition, so no transitionend, and the
-// listener above never runs. Coalesced through one animation frame so a burst
-// of state changes (28 plates re-evaluated on every current-node change) costs
-// one layout read rather than 28.
-let anchorFrame: number | undefined;
-function scheduleAnchorRecompute(): void {
-  if (anchorFrame !== undefined) return;
-  anchorFrame = requestAnimationFrame(() => {
-    anchorFrame = undefined;
-    recomputeAnchors();
-    updateGauge();
-  });
-}
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
