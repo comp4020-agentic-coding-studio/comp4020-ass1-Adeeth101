@@ -72,3 +72,15 @@ export function slots(count: number, box: Box): { centre: number; width: number 
 export function polyline(points: readonly { x: number; y: number }[]): string {
   return points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
 }
+
+// The collapsed state of a chart plate: a miniature of the same data, small
+// enough to read as an icon. Derived from the real series rather than drawn by
+// hand, so the glyph cannot come to disagree with the chart it stands for.
+export const GLYPH_BOX: Box = {
+  width: 132,
+  height: 40,
+  padLeft: 2,
+  padRight: 2,
+  padTop: 4,
+  padBottom: 4,
+};

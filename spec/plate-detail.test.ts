@@ -58,8 +58,12 @@ describe("the collapse's stylesheet and wiring contract", () => {
     // transition never settled — a plate opened and then stayed open at its
     // full height forever, with the gauge anchors never recomputed. 0s applies
     // the property instantly with no transition to get stuck in.
+    // Matched on the rule that names .plate-detail in its selector list, since
+    // .chart-glyph -- the chart plates' inverse collapse -- shares it and for
+    // exactly the same measured reason.
     const reduced = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
-    const rule = reduced.match(/\.plate-detail\s*\{[^}]*\}/)?.[0] ?? "";
+    const rule = reduced.match(/\.plate-detail[^{]*\{[^}]*\}/)?.[0] ?? "";
+    expect(rule).toContain(".chart-glyph");
     expect(rule).toMatch(/transition-duration:\s*0s\s*!important/);
     expect(rule).not.toMatch(/1ms/);
   });
@@ -70,11 +74,11 @@ describe("the collapse's stylesheet and wiring contract", () => {
     // fallback that covers it.
     expect(main).toMatch(/scheduleAnchorRecompute/);
     expect(main).toMatch(/requestAnimationFrame[\s\S]{0,200}recomputeAnchors/);
-    // and it must be called wherever the state is actually written: once for
-    // lineage plates, once for chart plates.
-    const writes = main.split("dataset.expanded = next;").length - 1;
+    // One per collapse-owning component: lineage plates and chart plates.
+    // Counted rather than pattern-matched around the write, because a chart
+    // plate writes the state twice (its detail and its own dataset, which
+    // drives the glyph) and still needs exactly one recompute.
     const schedules = main.split("scheduleAnchorRecompute();").length - 1;
-    expect(writes, "a state write with no anchor recompute beside it").toBeGreaterThanOrEqual(2);
-    expect(schedules).toBeGreaterThanOrEqual(writes);
+    expect(schedules, "a component whose state change never recomputes anchors").toBeGreaterThanOrEqual(2);
   });
 });

@@ -11,7 +11,7 @@
 // a thousandth of today's level for a billion years", not "line chart".
 
 import { BIG_FIVE, OXYGEN_CURVE, OXYGEN_MARKERS } from "./data/figures";
-import { CHART_BOX, linearY, logY, slots, timeX } from "./charts";
+import { CHART_BOX, GLYPH_BOX, linearY, logY, slots, timeX } from "./charts";
 
 const B = CHART_BOX;
 const MIN_PAL = 1e-6;
@@ -141,6 +141,46 @@ export function extinctionChartSvg(): string {
 
   return (
     `<svg viewBox="0 0 ${B.width} ${B.height}" class="chart-svg" role="img" aria-label="${esc(label)}">` +
+    parts.join("") +
+    "</svg>"
+  );
+}
+
+// The collapsed glyphs. Same data, same scales, no labels — they carry shape
+// only, and are aria-hidden because the full chart underneath keeps its
+// role="img" and its aria-label whether the plate is open or shut.
+export function oxygenGlyphSvg(): string {
+  const G = GLYPH_BOX;
+  const parts = OXYGEN_CURVE.map((seg) => {
+    const x1 = timeX(seg.fromMa, OLDEST, 0, G);
+    const x2 = timeX(seg.toMa, OLDEST, 0, G);
+    const y1 = logY(seg.fromPal, MIN_PAL, MAX_PAL, G);
+    const y2 = logY(seg.toPal, MIN_PAL, MAX_PAL, G);
+    return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="chart-line${seg.constrained ? "" : " is-open"}" />`;
+  });
+  return (
+    `<svg viewBox="0 0 ${G.width} ${G.height}" class="chart-glyph-svg" aria-hidden="true" focusable="false">` +
+    parts.join("") +
+    "</svg>"
+  );
+}
+
+export function extinctionGlyphSvg(): string {
+  const G = GLYPH_BOX;
+  const floor = G.height - G.padBottom;
+  const lanes = slots(BIG_FIVE.length, G);
+  const parts = BIG_FIVE.map((event, i) => {
+    const lane = lanes[i];
+    const x = (lane.centre - lane.width / 2).toFixed(1);
+    const w = lane.width.toFixed(1);
+    if (event.speciesLostPct === null) {
+      return `<rect x="${x}" y="${G.padTop}" width="${w}" height="${(floor - G.padTop).toFixed(1)}" class="chart-bar is-unknown" />`;
+    }
+    const y = linearY(event.speciesLostPct, 0, 100, G);
+    return `<rect x="${x}" y="${y.toFixed(1)}" width="${w}" height="${(floor - y).toFixed(1)}" class="chart-bar" />`;
+  });
+  return (
+    `<svg viewBox="0 0 ${G.width} ${G.height}" class="chart-glyph-svg" aria-hidden="true" focusable="false">` +
     parts.join("") +
     "</svg>"
   );

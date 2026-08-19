@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { BIG_FIVE, FIGURE_SOURCES, OXYGEN_CURVE } from "../src/data/figures";
-import { CHART_BOX, linearY, logY, polyline, slots, timeX } from "../src/charts";
+import { CHART_BOX, GLYPH_BOX, linearY, logY, polyline, slots, timeX } from "../src/charts";
+import { extinctionGlyphSvg, oxygenGlyphSvg } from "../src/figure-svg";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 // Written before the charts rendered, and observed failing first.
 
@@ -132,5 +135,60 @@ describe("the figure data", () => {
       expect(s).toMatch(/\b(19|20)\d{2}\b/);
       expect(s.length).toBeGreaterThan(60);
     }
+  });
+});
+
+// The collapsed state. A chart plate shut is a title and a miniature; the full
+// figure and the prose are behind the same collapse a lineage plate uses.
+describe("the chart glyphs", () => {
+  const css = readFileSync(resolve(import.meta.dirname, "../styles.css"), "utf8");
+  const main = readFileSync(resolve(import.meta.dirname, "../main.ts"), "utf8");
+
+  it("draws one mark per real datum, from the same series as the full chart", () => {
+    // Derived, not hand-drawn: a glyph traced by hand would drift away from the
+    // chart it stands for the first time the data changed.
+    const oxy = oxygenGlyphSvg();
+    expect((oxy.match(/<line /g) ?? []).length).toBe(OXYGEN_CURVE.length);
+    const ext = extinctionGlyphSvg();
+    expect((ext.match(/<rect /g) ?? []).length).toBe(BIG_FIVE.length);
+    // and the two Stanley declines to estimate stay open in the miniature too
+    expect((ext.match(/is-unknown/g) ?? []).length).toBe(
+      BIG_FIVE.filter((e) => e.speciesLostPct === null).length,
+    );
+  });
+
+  it("keeps the dashed/solid distinction at glyph size", () => {
+    expect(oxygenGlyphSvg()).toContain("is-open");
+  });
+
+  it("is hidden from assistive tech, because the full chart keeps the label", () => {
+    for (const svg of [oxygenGlyphSvg(), extinctionGlyphSvg()]) {
+      expect(svg).toContain('aria-hidden="true"');
+      expect(svg).toContain('focusable="false"');
+      expect(svg).not.toContain("role=\"img\"");
+    }
+  });
+
+  it("is small enough to read as an icon rather than a second chart", () => {
+    expect(GLYPH_BOX.width).toBeLessThan(CHART_BOX.width / 4);
+    expect(GLYPH_BOX.height).toBeLessThan(CHART_BOX.height / 4);
+  });
+
+  it("puts the figure and its legend inside the collapse, not above it", () => {
+    // The point of the change: shut, the plate is a glyph. If the chart were
+    // still appended to .plate-text it would stay visible whatever the state.
+    expect(main).toMatch(/detailIn\.append\(chart\)/);
+    expect(main).toMatch(/text\.append\(standfirst, title, glyph, detail\)/);
+  });
+
+  it("collapses the glyph on the same mechanism as the detail, inverted", () => {
+    // Anchored to a top-level rule: the reduced-motion block also names
+    // .chart-glyph, appears earlier in the file, and was what an unanchored
+    // match found.
+    const glyph = css.match(/^\.chart-glyph\s*\{[^}]*\}/m)?.[0] ?? "";
+    expect(glyph).toMatch(/grid-template-rows:\s*1fr/);
+    expect(glyph).toMatch(/transition:[\s\S]*grid-template-rows/);
+    const open = css.match(/^\.plate-figure-card\[data-expanded="true"\] \.chart-glyph\s*\{[^}]*\}/m)?.[0] ?? "";
+    expect(open).toMatch(/grid-template-rows:\s*0fr/);
   });
 });

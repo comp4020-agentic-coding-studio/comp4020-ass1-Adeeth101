@@ -119,9 +119,14 @@ html {
      needed to beat the blanket `*` rule above. main.ts schedules its own anchor
      recompute on the next frame whenever the state changes, which is what
      covers the case where there is now no transitionend to listen for. */
-  .plate-detail {
+  .plate-detail,
+  .chart-glyph {
     opacity: 1;
     transition-duration: 0s !important;
+  }
+
+  .plate-figure-card[data-expanded="true"] .chart-glyph {
+    opacity: 0;
   }
 
   /* The required static fallback: the sequence goes, the plate's own still
@@ -433,6 +438,34 @@ nav[aria-label="Chapters"] {
    the line at a chart. */
 .node-row-figure {
   padding-left: 0;
+}
+
+/* The collapsed state of a chart plate: a miniature of the same series, on the
+   same collapse mechanism as .plate-detail but inverted, so the glyph shrinks
+   away as the figure grows instead of vanishing under it. Both transitions end
+   on grid-template-rows, which is what main.ts listens for to recompute the
+   depth gauge's anchors -- and a chart plate's height changes by far more
+   between its two states than a lineage plate's does. */
+.chart-glyph {
+  display: grid;
+  grid-template-rows: 1fr;
+  margin-top: var(--s3);
+  opacity: 1;
+  transition:
+    grid-template-rows var(--dur) var(--ease),
+    opacity var(--dur) var(--ease);
+}
+
+.plate-figure-card[data-expanded="true"] .chart-glyph {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.chart-glyph-svg {
+  display: block;
+  width: 132px;
+  max-width: 100%;
+  height: auto;
 }
 
 .plate-chart {

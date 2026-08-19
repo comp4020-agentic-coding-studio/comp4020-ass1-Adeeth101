@@ -16,7 +16,12 @@ import { INTERLUDES } from "./src/data/interludes";
 import { clashesWithNote, reservedBand } from "./src/spacer-layout";
 import { FIGURE_PLATES } from "./src/data/figure-plates";
 import { FIGURE_SOURCES } from "./src/data/figures";
-import { extinctionChartSvg, oxygenChartSvg } from "./src/figure-svg";
+import {
+  extinctionChartSvg,
+  extinctionGlyphSvg,
+  oxygenChartSvg,
+  oxygenGlyphSvg,
+} from "./src/figure-svg";
 import { eraFor, formatAge, plateFacts, romanNumeral } from "./src/plate-format";
 import { DISPLAY_SIZES, plateImage, type PlateImageSource } from "./src/plate-image";
 import { plateExpanded } from "./src/plate-detail";
@@ -547,6 +552,8 @@ function figurePlateElement(figure: (typeof FIGURE_PLATES)[number]): HTMLElement
 
   const detailIn = document.createElement("div");
   detailIn.className = "plate-detail-in";
+  detailIn.append(chart);
+  if (legend.childElementCount > 0) detailIn.append(legend);
   detailIn.append(body, cap);
 
   const detail = document.createElement("div");
@@ -554,11 +561,21 @@ function figurePlateElement(figure: (typeof FIGURE_PLATES)[number]): HTMLElement
   detail.dataset.expanded = "false";
   detail.append(detailIn);
 
+  // Shut, a chart plate is its title and a miniature of its own data. The
+  // glyph collapses on exactly the same mechanism as the detail, just
+  // inverted, so the two cross-fade instead of one snapping out while the
+  // other eases in.
+  const glyphIn = document.createElement("div");
+  glyphIn.className = "plate-detail-in";
+  glyphIn.innerHTML = figure.sourceKey === "oxygen" ? oxygenGlyphSvg() : extinctionGlyphSvg();
+
+  const glyph = document.createElement("div");
+  glyph.className = "chart-glyph";
+  glyph.append(glyphIn);
+
   const text = document.createElement("div");
   text.className = "plate-text";
-  text.append(standfirst, title, chart);
-  if (legend.childElementCount > 0) text.append(legend);
-  text.append(detail);
+  text.append(standfirst, title, glyph, detail);
 
   const plateIn = document.createElement("div");
   plateIn.className = "plate-in";
@@ -570,6 +587,7 @@ function figurePlateElement(figure: (typeof FIGURE_PLATES)[number]): HTMLElement
   const plate = document.createElement("section");
   plate.className = "plate plate-figure-card";
   plate.id = figure.id;
+  plate.dataset.expanded = "false";
   plate.tabIndex = -1;
   plate.append(frame, plateIn);
 
@@ -580,6 +598,7 @@ function figurePlateElement(figure: (typeof FIGURE_PLATES)[number]): HTMLElement
     const next = String(plateExpanded(hoverFocus));
     if (detail.dataset.expanded === next) return;
     detail.dataset.expanded = next;
+    plate.dataset.expanded = next;
     scheduleAnchorRecompute();
   };
   plate.addEventListener("pointerenter", () => {
