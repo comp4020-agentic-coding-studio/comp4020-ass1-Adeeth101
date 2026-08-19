@@ -51,4 +51,30 @@ describe("the collapse's stylesheet and wiring contract", () => {
     const reduced = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
     expect(reduced).toMatch(/\.plate-detail/);
   });
+
+  it("kills the transition outright under reduced motion rather than shortening it", () => {
+    // Measured, not assumed: at the blanket 1ms this file used to inherit,
+    // Chrome fired no transitionend at all AND the grid-template-rows
+    // transition never settled — a plate opened and then stayed open at its
+    // full height forever, with the gauge anchors never recomputed. 0s applies
+    // the property instantly with no transition to get stuck in.
+    const reduced = css.slice(css.indexOf("@media (prefers-reduced-motion: reduce)"));
+    const rule = reduced.match(/\.plate-detail\s*\{[^}]*\}/)?.[0] ?? "";
+    expect(rule).toMatch(/transition-duration:\s*0s\s*!important/);
+    expect(rule).not.toMatch(/1ms/);
+  });
+
+  it("recomputes anchors on a state change too, not only on transitionend", () => {
+    // Under reduced motion there is no transition, so no transitionend, so the
+    // listener that keeps the depth gauge honest never runs. This is the
+    // fallback that covers it.
+    expect(main).toMatch(/scheduleAnchorRecompute/);
+    expect(main).toMatch(/requestAnimationFrame[\s\S]{0,200}recomputeAnchors/);
+    // and it must be called wherever the state is actually written: once for
+    // lineage plates, once for chart plates.
+    const writes = main.split("dataset.expanded = next;").length - 1;
+    const schedules = main.split("scheduleAnchorRecompute();").length - 1;
+    expect(writes, "a state write with no anchor recompute beside it").toBeGreaterThanOrEqual(2);
+    expect(schedules).toBeGreaterThanOrEqual(writes);
+  });
 });

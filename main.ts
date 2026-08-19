@@ -420,9 +420,12 @@ for (const [index, node] of LINEAGE.entries()) {
   // focus landing anywhere inside the plate counts.
   const hoverFocus = { isHovered: false, isFocused: false };
   const applyDetail = (): void => {
-    detail.dataset.expanded = String(
+    const next = String(
       plateExpanded({ isCurrent: plate.classList.contains("plate-on"), ...hoverFocus }),
     );
+    if (detail.dataset.expanded === next) return;
+    detail.dataset.expanded = next;
+    scheduleAnchorRecompute();
   };
   plate.addEventListener("pointerenter", () => {
     hoverFocus.isHovered = true;
@@ -563,7 +566,10 @@ function figurePlateElement(figure: (typeof FIGURE_PLATES)[number]): HTMLElement
   // current node, because it is not a node. Hover or focus opens it.
   const hoverFocus = { isCurrent: false, isHovered: false, isFocused: false };
   const apply = (): void => {
-    detail.dataset.expanded = String(plateExpanded(hoverFocus));
+    const next = String(plateExpanded(hoverFocus));
+    if (detail.dataset.expanded === next) return;
+    detail.dataset.expanded = next;
+    scheduleAnchorRecompute();
   };
   plate.addEventListener("pointerenter", () => {
     hoverFocus.isHovered = true;
@@ -707,6 +713,21 @@ lineageEl.addEventListener("transitionend", (event) => {
   recomputeAnchors();
   updateGauge();
 });
+
+// The same recompute, but not waiting for a transition to end — because under
+// prefers-reduced-motion there is no transition, so no transitionend, and the
+// listener above never runs. Coalesced through one animation frame so a burst
+// of state changes (28 plates re-evaluated on every current-node change) costs
+// one layout read rather than 28.
+let anchorFrame: number | undefined;
+function scheduleAnchorRecompute(): void {
+  if (anchorFrame !== undefined) return;
+  anchorFrame = requestAnimationFrame(() => {
+    anchorFrame = undefined;
+    recomputeAnchors();
+    updateGauge();
+  });
+}
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;

@@ -107,12 +107,21 @@ html {
     scroll-behavior: auto;
   }
 
-  /* The collapse still collapses, it just doesn't animate: the 1ms above keeps
-     transitionend firing, so the gauge anchors are still recomputed. Opacity is
-     pinned open so no plate can be left half-faded by a transition that had no
-     time to run. */
+  /* That 1ms was wrong, and measurably so. At 1ms Chrome fires no transitionend
+     at all, and worse, a grid-template-rows transition that short does not
+     settle: after setting data-expanded="false" the row stayed latched at its
+     open height. So under reduced motion a plate opened and then never closed,
+     and the depth gauge's anchors -- which are recomputed on transitionend --
+     were never recomputed either.
+
+     0s rather than 1ms, so the property applies instantly and cleanly with no
+     transition to get stuck in. !important and a class selector are both
+     needed to beat the blanket `*` rule above. main.ts schedules its own anchor
+     recompute on the next frame whenever the state changes, which is what
+     covers the case where there is now no transitionend to listen for. */
   .plate-detail {
     opacity: 1;
+    transition-duration: 0s !important;
   }
 
   /* The required static fallback: the sequence goes, the plate's own still
