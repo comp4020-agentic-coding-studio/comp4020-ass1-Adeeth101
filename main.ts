@@ -12,6 +12,7 @@ import { LINEAGE, type LineageNode } from "./src/data/lineage";
 import { createLineage } from "./src/lineage-state";
 import { backgroundCssAt } from "./src/era-palette";
 import { markersFor, spacerHeightsVh } from "./src/pacing";
+import { INTERLUDES } from "./src/data/interludes";
 import { eraFor, formatAge, plateFacts, romanNumeral } from "./src/plate-format";
 import { DISPLAY_SIZES, plateImage, type PlateImageSource } from "./src/plate-image";
 import { plateExpanded } from "./src/plate-detail";
@@ -182,17 +183,44 @@ function spacerAfter(index: number): HTMLElement | null {
 
   const spacer = document.createElement("div");
   spacer.className = "node-spacer";
-  spacer.setAttribute("aria-hidden", "true");
   spacer.style.setProperty("--gap", `${heightVh.toFixed(2)}vh`);
 
   // Only the long deep-time spacers get these; the modern gaps are too short
   // to clear the threshold, so they come back empty on their own.
+  //
+  // aria-hidden moved from the spacer onto the marks themselves. It used to sit
+  // on the whole spacer, to keep ten redundant date announcements out of the
+  // reading order — but aria-hidden hides everything beneath it, and the
+  // interludes below are real prose that a screen-reader user needs. The marks
+  // stay hidden; the notes are now read.
   for (const { offsetVh, ageMa } of markersFor(heightVh, AGES[index], AGES[index + 1])) {
     const mark = document.createElement("p");
     mark.className = "spacer-mark";
+    mark.setAttribute("aria-hidden", "true");
     mark.style.setProperty("--at", `${offsetVh.toFixed(2)}vh`);
     mark.textContent = `${eraFor(ageMa)} · ${formatAge(ageMa)} ago`;
     spacer.append(mark);
+  }
+
+  // What was happening across the emptiness, and why it left no trace. The
+  // spacer's own length is the argument — this is here so that length does not
+  // read as "nothing happened", which is both false and the opposite of the
+  // point. See src/data/interludes.ts.
+  for (const note of INTERLUDES.filter((n) => n.after === index)) {
+    const aside = document.createElement("aside");
+    aside.className = "spacer-note";
+    aside.style.setProperty("--at", `${(note.at * heightVh).toFixed(2)}vh`);
+
+    const body = document.createElement("p");
+    body.className = "spacer-note-text";
+    body.textContent = note.text;
+
+    const cite = document.createElement("p");
+    cite.className = "spacer-note-source";
+    cite.textContent = note.source;
+
+    aside.append(body, cite);
+    spacer.append(aside);
   }
   return spacer;
 }
