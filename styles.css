@@ -426,11 +426,24 @@ nav[aria-label="Chapters"] {
 /* ---- Chart plates (src/data/figure-plates.ts) ---- */
 
 /* A chart plate reuses .plate wholesale, so it inherits the frame, the lit
-   state and the collapse without a parallel set of rules. It only needs the
-   gutter removed: there is no branch diagram beside it, because nothing leaves
-   the line at a chart. */
-.node-row-figure {
-  padding-left: 0;
+   state and the collapse without a parallel set of rules. What it needs is a
+   home: it sits inside a spacer, positioned like an interlude, so that opening
+   it expands into empty page rather than displacing the next node. No branch
+   diagram beside it either — nothing leaves the line at a chart. */
+.spacer-figure {
+  position: absolute;
+  top: var(--at, 0);
+  right: 0;
+  left: 0;
+  max-width: calc(940px + var(--s7) + var(--s8));
+  margin-inline: auto;
+  padding-inline: 18px;
+}
+
+@media (width >= 720px) {
+  .spacer-figure {
+    padding-inline: 32px;
+  }
 }
 
 /* The collapsed state of a chart plate: a miniature of the same series, on the

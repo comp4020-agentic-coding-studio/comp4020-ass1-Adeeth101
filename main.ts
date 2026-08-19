@@ -231,6 +231,18 @@ function spacerAfter(index: number): HTMLElement | null {
     aside.append(body, cite);
     spacer.append(aside);
   }
+
+  // Chart plates sit in the empty stretches too, at the fraction that puts them
+  // at the date they depict. Absolutely positioned like the interludes, so an
+  // 823px expansion opens into page that is already blank instead of shoving
+  // the next node down the screen.
+  for (const figure of FIGURE_PLATES.filter((f) => f.after === index)) {
+    const holder = document.createElement("div");
+    holder.className = "spacer-figure";
+    holder.style.setProperty("--at", `${(figure.at * heightVh).toFixed(2)}vh`);
+    holder.append(figurePlateElement(figure));
+    spacer.append(holder);
+  }
   return spacer;
 }
 
@@ -489,9 +501,6 @@ for (const [index, node] of LINEAGE.entries()) {
   lineageEl.append(outer);
   const spacer = spacerAfter(index);
   if (spacer !== null) lineageEl.append(spacer);
-  for (const figure of FIGURE_PLATES.filter((f) => f.after === index)) {
-    lineageEl.append(figurePlateElement(figure));
-  }
   plates.push(plate);
   rows.push(outer);
   diagrams.push(diagram);
@@ -623,10 +632,7 @@ function figurePlateElement(figure: (typeof FIGURE_PLATES)[number]): HTMLElement
     apply();
   });
 
-  const row = document.createElement("div");
-  row.className = "node-row node-row-figure";
-  row.append(plate);
-  return row;
+  return plate;
 }
 
 function renderCurrent(shouldFocus: boolean): void {
@@ -745,6 +751,7 @@ function scheduleAnchorRecompute(): void {
   if (anchorFrame !== undefined) return;
   anchorFrame = requestAnimationFrame(() => {
     anchorFrame = undefined;
+    reflowSpacerMarks();
     recomputeAnchors();
     updateGauge();
   });
@@ -764,12 +771,18 @@ function reflowSpacerMarks(): void {
   const vh = window.innerHeight;
   if (vh <= 0) return;
   for (const spacer of lineageEl.querySelectorAll<HTMLElement>(".node-spacer")) {
-    const notes = spacer.querySelectorAll<HTMLElement>(".spacer-note");
-    if (notes.length === 0) continue;
-    const bands = [...notes].map((note) =>
+    // Charts reserve space on exactly the same terms as interludes — they are
+    // blocks of content dropped into an empty stretch, and a date marker
+    // printed across one is as wrong in either case. A chart's band is measured
+    // from its current height, so it grows when the chart is expanded and the
+    // markers under it drop out; scheduleAnchorRecompute re-runs this whenever
+    // any collapse changes.
+    const blocks = spacer.querySelectorAll<HTMLElement>(".spacer-note, .spacer-figure");
+    if (blocks.length === 0) continue;
+    const bands = [...blocks].map((block) =>
       reservedBand(
-        Number.parseFloat(note.style.getPropertyValue("--at")),
-        (note.offsetHeight / vh) * 100,
+        Number.parseFloat(block.style.getPropertyValue("--at")),
+        (block.offsetHeight / vh) * 100,
       ),
     );
     for (const mark of spacer.querySelectorAll<HTMLElement>(".spacer-mark")) {
@@ -785,6 +798,31 @@ window.addEventListener("resize", () => {
   reflowSpacerMarks();
   recomputeAnchors();
 });
+
+// Blocks settle later than the first reflow can see. A chart plate's height is
+// not final until its SVG has laid out, which is after the initial pass and
+// after document.fonts.ready — so the first run measured a chart shorter than
+// it ended up and left a date marker printed across it. Rather than guessing at
+// a timing, watch the blocks: any height change at all re-runs the reflow, which
+// covers webfonts, SVG layout, expansion and resize with one mechanism.
+//
+// This cannot feed back on itself: the reflow only toggles markers, and markers
+// are absolutely positioned, so nothing it does can change a block's height.
+if ("ResizeObserver" in window) {
+  // The reflow runs synchronously here rather than being deferred to the next
+  // animation frame. ResizeObserver already fires after layout, so the
+  // measurements are good immediately — and requestAnimationFrame does not run
+  // at all while a tab is hidden, which would leave a marker printed across an
+  // expanded chart until the tab came back. Anchors still coalesce through a
+  // frame, since those are read-only and cost more.
+  const blockObserver = new ResizeObserver(() => {
+    reflowSpacerMarks();
+    scheduleAnchorRecompute();
+  });
+  for (const block of lineageEl.querySelectorAll(".spacer-note, .spacer-figure")) {
+    blockObserver.observe(block);
+  }
+}
 
 // Webfonts change how the prose wraps, which changes every note's height, which
 // moves every reserved band. Without this the bands are measured against the

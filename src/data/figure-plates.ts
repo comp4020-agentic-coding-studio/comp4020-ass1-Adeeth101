@@ -15,8 +15,18 @@
 
 export interface FigurePlate {
   id: string;
-  // Rendered after the spacer that follows this lineage node index.
+  // Placed INSIDE the spacer that follows this lineage node index, at `at` of
+  // the way down it — the same treatment as an interlude, and for the same
+  // reason. As a row between two plates, expanding one of these shoved the
+  // neighbouring node down by 823px and read as a jolt. Absolutely positioned
+  // in a stretch that is already empty, it expands into nothing and nothing
+  // visible moves.
   after: number;
+  at: number;
+  // The window of time the figure actually depicts. The spec checks that `at`
+  // lands the plate at a scroll position whose interpolated age falls inside
+  // this, so a chart cannot drift away from the stretch it is about.
+  spansMa: readonly [number, number];
   title: string;
   standfirst: string;
   // The reading of the chart — what a viewer should take from it, including
@@ -32,7 +42,11 @@ export interface FigurePlate {
 export const FIGURE_PLATES: readonly FigurePlate[] = [
   {
     id: "figure-oxygen",
+    // The LUCA gap, just past the interlude that introduces the Great
+    // Oxidation Event, which sits at 0.77 of the same spacer.
     after: 0,
+    at: 0.811,
+    spansMa: [2426, 2060],
     title: "Why the first half takes so long",
     standfirst: "Atmospheric oxygen, as an upper bound, against time",
     body: [
@@ -47,7 +61,14 @@ export const FIGURE_PLATES: readonly FigurePlate[] = [
   },
   {
     id: "figure-extinctions",
-    after: 14,
+    // The Permian gap. The Big Five span 445 to 66 Ma and no single spacer
+    // holds all of them, so this sits inside that span with the largest of the
+    // five — the end-Permian at 252 Ma — as the next one ahead of the reader.
+    // It is also the longest spacer in the window, which is what gives an
+    // opened chart room to expand into empty page.
+    after: 16,
+    at: 0.3,
+    spansMa: [445, 66],
     title: "Five times most things died",
     standfirst: "Marine species lost in the Big Five mass extinctions",
     body: [

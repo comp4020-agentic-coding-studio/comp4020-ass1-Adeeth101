@@ -70,4 +70,16 @@ describe("the reflow's wiring contract", () => {
   it("re-runs once webfonts land, because that changes how the prose wraps", () => {
     expect(main).toMatch(/fonts[\s\S]{0,200}reflowSpacerMarks/);
   });
+
+  it("watches the blocks rather than guessing when they have settled", () => {
+    // A chart plate's height is not final until its SVG has laid out, which is
+    // after both the initial pass and fonts.ready — the first run measured one
+    // short and left a marker printed across it.
+    expect(main).toMatch(/ResizeObserver/);
+    expect(main).toMatch(/blockObserver\.observe/);
+  });
+
+  it("reserves space for charts on the same terms as interludes", () => {
+    expect(main).toMatch(/"\.spacer-note, \.spacer-figure"/);
+  });
 });
